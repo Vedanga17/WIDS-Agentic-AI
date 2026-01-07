@@ -39,7 +39,7 @@ WIDS Project/
 ├── Scripts/
 │   ├── lang_graph.py              # LangGraph stateful agent implementation
 │   ├── local-ai-agent.py          # RAG-based Q&A system for restaurant reviews
-│   ├── starting.py                # Sentiment analysis experiments
+│   ├── transformer.py             # Sentiment analysis experiments
 │   ├── vector.py                  # Vector store initialization and retrieval
 │   └── realistic_restaurant_reviews.csv  # Restaurant review dataset
 ├── chroma_langchain_db/           # ChromaDB vector database storage
@@ -112,7 +112,7 @@ Run sentiment analysis experiments on movie reviews:
 
 ```bash
 cd Scripts
-python starting.py
+python transformer.py
 ```
 
 ### Exploring LangGraph Agents
@@ -141,7 +141,7 @@ Handles:
 - ChromaDB vector store initialization and management
 - Semantic similarity search with configurable retrieval parameters
 
-### 3. Sentiment Analysis (`starting.py`)
+### 3. Sentiment Analysis (`transformer.py`)
 
 Demonstrates:
 - Pre-trained BERT-based sentiment classification
