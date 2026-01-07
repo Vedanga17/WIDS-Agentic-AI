@@ -1,16 +1,11 @@
+from transformers import pipeline
 
-#import numpy as np
-#import matplotlib.pyplot as plt 
-#import torch
-
-'''
+#Q1
 summ = pipeline("summarization", model="facebook/bart-large-cnn")
 
-original = India's set the pace in women's cricket in 2025, consistently dictating terms rather than reacting. Their intent was 
-underlined early with a record-breaking 435/5 against Ireland Women at Rajkot in January, which is the highest ODI total by India 
-and among the top five in women's cricket history. India's batting depth, especially beyond the top order, kept constant pressure 
+original = """India's set the pace in women's cricket in 2025, consistently dictating terms rather than reacting. Their intent was underlined early with a record-breaking 435/5 against Ireland Women at Rajkot in January, which is the highest ODI total by India and among the top five in women's cricket history. India\'s batting depth, especially beyond the top order, kept constant pressure 
 on teams, making 300-plus scores normal rather than ambitious and forcing opponents to change their tactics. India scored nine 
-300-plus totals in 2025, which is the most by any team in an ODI calendar year.
+300-plus totals in 2025, which is the most by any team in an ODI calendar year."""
 
 text = summ(original, max_length=120, min_length=40, truncation=True)
 
@@ -18,14 +13,14 @@ print("Summary:", text[0]['summary_text'])
 print("\nLength of original text:", len(original.split()))
 print("\nLength of summary text:", len(text[0]['summary_text'].split()))
 
-
+#Q2
 text_gen = pipeline("text-generation", model="gpt2")
 output = text_gen("The AI boom has led to a shift", max_length=70, num_return_sequences=2, max_new_tokens=50, truncation=True)
 for i, out in enumerate(output):
-    print("\nGenerated Text", i+1, ":", out['generated_text'])'''
+    print("\nGenerated Text", i+1, ":", out['generated_text'])
 
-from transformers import pipeline
 
+#Q3
 reviewer = pipeline("sentiment-analysis", model="nlptown/bert-base-multilingual-uncased-sentiment")
 
 movie1 = '''This classic French short is a visually inventive and wondrous portrait of a young boy's friendship with a sentient red balloon 
