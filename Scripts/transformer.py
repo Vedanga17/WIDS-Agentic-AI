@@ -1,3 +1,5 @@
+#This is part of Assignment 1 (using transformer pipelines for NLP tasks)
+
 from transformers import pipeline
 
 #Q1
