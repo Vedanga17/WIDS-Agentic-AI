@@ -19,8 +19,8 @@ graph.set_finish_point("complimenter")
 
 app = graph.compile()
 
-from IPython.display import Image, display
-display(Image(app.get_graph().draw_mermaid_png))
+#from IPython.display import Image, display
+# display(Image(app.get_graph().draw_mermaid_png))
 
 result = app.invoke({"name": "Alice"})
 print(result["name"])
