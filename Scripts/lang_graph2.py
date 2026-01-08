@@ -1,3 +1,5 @@
+#Learning to handle multiple inputs at once in LangGraph
+
 from typing import List, Dict, TypedDict
 from langgraph.graph import StateGraph
 
