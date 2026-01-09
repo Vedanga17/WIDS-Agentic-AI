@@ -32,7 +32,7 @@ def add_node2(state: AgentState) -> AgentState:
     return state  
 
 def subtract_node2(state: AgentState) -> AgentState:
-    """ This node subtracts the 4th number from the 3rd number to the current final_number. """
+    """ This node subtracts the 4th number from the 3rd number. """
     state["final_number2"] = state["number3"] - state["number4"]
     return state
 
@@ -90,12 +90,14 @@ graph.add_edge("subtract_node2", END)
 
 app = graph.compile()
 
+lst = eval(input("Enter the 4 numbers as input: "))
+
 initial_state = AgentState(
-    number1=10,
-    number2=5,
+    number1=lst[0],
+    number2=lst[1],
     operation1="-",
-    number3=7,
-    number4=2,
+    number3=lst[2],
+    number4=lst[3],
     operation2="+",
     final_number=0,
     final_number2=0
