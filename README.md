@@ -37,14 +37,21 @@ The primary use case involves a restaurant review analysis system that can answe
 ```
 WIDS Project/
 ├── Scripts/
-│   ├── lang_graph.py              # LangGraph stateful agent implementation
-│   ├── local-ai-agent.py          # RAG-based Q&A system for restaurant reviews
 │   ├── transformer.py             # Sentiment analysis experiments
-│   ├── vector.py                  # Vector store initialization and retrieval
-│   └── realistic_restaurant_reviews.csv  # Restaurant review dataset
-├── chroma_langchain_db/           # ChromaDB vector database storage
+│   ├── Langchain/
+│   │   ├── local-ai-agent.py      # RAG-based Q&A system for restaurant reviews
+│   │   ├── vector.py              # Vector store initialization and retrieval
+│   │   └── realistic_restaurant_reviews.csv  # Restaurant review dataset
+│   ├── Langgraph/
+│   │   ├── lang_graph1.py         # Basic LangGraph structure
+│   │   ├── lang_graph2.py         # Handling multiple inputs
+│   │   ├── lang_graph3.py         # Multiple nodes and edges
+│   │   ├── lang_graph4.py         # Conditional routing
+│   │   └── lang_graph5.py         # Interactive number guessing game
+│   └── chroma_langchain_db/       # ChromaDB vector database storage
 ├── venv/                          # Python virtual environment
-└── .gitignore                     # Git ignore configuration
+├── requirements.txt               # Project dependencies
+└── README.md                      # Project documentation
 ```
 
 ## Prerequisites
@@ -97,7 +104,7 @@ Before running this project, ensure you have the following installed:
 This agent answers questions about a pizza restaurant based on customer reviews:
 
 ```bash
-cd Scripts
+cd Scripts/Langchain
 python local-ai-agent.py
 ```
 
@@ -115,25 +122,53 @@ cd Scripts
 python transformer.py
 ```
 
-### Exploring LangGraph Agents
+### Exploring LangGraph Tutorials
 
-Execute the stateful agent workflow:
+The project includes progressive LangGraph tutorials demonstrating various concepts:
 
+**1. Basic Structure (lang_graph1.py)**
 ```bash
-cd Scripts
-python lang_graph.py
+cd Scripts/Langgraph
+python lang_graph1.py
 ```
+Learn the simplest LangGraph structure with a single node.
+
+**2. Multiple Inputs (lang_graph2.py)**
+```bash
+python lang_graph2.py
+```
+Handle multiple inputs and perform calculations (addition/multiplication).
+
+**3. Sequential Workflow (lang_graph3.py)**
+```bash
+python lang_graph3.py
+```
+Chain multiple nodes together in a sequential workflow.
+
+**4. Conditional Routing (lang_graph4.py)**
+```bash
+python lang_graph4.py
+```
+Implement conditional logic to route between different operations.
+
+**5. Interactive Game (lang_graph5.py)**
+```bash
+python lang_graph5.py
+```
+Build a complete interactive number guessing game with state management.
 
 ## Components
 
-### 1. Local AI Agent (`local-ai-agent.py`)
+### 1. Langchain Components
+
+#### Local AI Agent (`Langchain/local-ai-agent.py`)
 
 Implements a RAG-based question-answering system that:
 - Retrieves relevant restaurant reviews from the vector database
 - Generates contextual answers using LLaMA 3.2
 - Provides an interactive command-line interface
 
-### 2. Vector Store (`vector.py`)
+#### Vector Store (`Langchain/vector.py`)
 
 Handles:
 - CSV data ingestion from restaurant reviews
@@ -141,19 +176,42 @@ Handles:
 - ChromaDB vector store initialization and management
 - Semantic similarity search with configurable retrieval parameters
 
-### 3. Sentiment Analysis (`transformer.py`)
+### 2. Sentiment Analysis (`transformer.py`)
 
 Demonstrates:
 - Pre-trained BERT-based sentiment classification
 - Multi-class rating prediction (1-5 stars)
 - Batch processing of review text
 
-### 4. LangGraph Agent (`lang_graph.py`)
+### 3. LangGraph Learning Series (`Langgraph/`)
 
-Showcases:
-- Stateful agent workflows using LangGraph
-- Graph-based agent architecture
-- Node-based processing pipeline
+Progressive tutorials showcasing LangGraph capabilities:
+
+#### lang_graph1.py - Basic Structure
+- Single node graph implementation
+- Simple state management with TypedDict
+- Entry and finish point configuration
+
+#### lang_graph2.py - Multiple Inputs
+- Processing lists of values
+- Conditional operations (addition/multiplication)
+- Handling complex input structures
+
+#### lang_graph3.py - Sequential Workflow
+- Multi-node pipeline with edges
+- State transformation across nodes
+- Sequential data processing
+
+#### lang_graph4.py - Conditional Routing
+- Dynamic node routing based on state
+- Multiple conditional branches
+- Decision-making functions
+
+#### lang_graph5.py - Interactive Application
+- Complete game implementation (number guessing)
+- User interaction handling
+- Complex state management with multiple attributes
+- Iterative workflows with loop conditions
 
 ## Technologies Used
 
