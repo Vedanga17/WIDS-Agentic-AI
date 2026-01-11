@@ -1,4 +1,5 @@
 #First introduction to AI Agents using Langgraph and Langchain with Groq LLM
+# importing the dependencies
 
 from typing import TypedDict, List
 from langgraph.graph import StateGraph, START, END
@@ -20,7 +21,7 @@ llm = ChatGroq(
 class AgentState(TypedDict):
     messages: List[HumanMessage] # for making agentstate class
 
-def process(state: AgentState) -> AgentState:
+def process(state: AgentState) -> AgentState: # defining the agent process
     response = llm.invoke(state["messages"])
     print(f"\n Agent response: {response.content}")
     return state
