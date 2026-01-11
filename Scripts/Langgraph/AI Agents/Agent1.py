@@ -6,14 +6,15 @@ from langchain_core.messages import HumanMessage
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 import os
+import time
 
 load_dotenv() # for storing API key
 
-# Initialize ChatGroq with your API key
+# Initialize Groq with fast inference
 llm = ChatGroq(
     model="llama-3.3-70b-versatile",
     temperature=0.7,
-    groq_api_key=os.getenv("GROQ_API_KEY")
+    api_key=os.getenv("GROQ_API_KEY")
 )
 
 class AgentState(TypedDict):
@@ -36,4 +37,5 @@ user_input = input("Enter your message: ")
 while user_input != "exit":
     result = agent.invoke({"messages": [HumanMessage(content=user_input)]})
     print(result["messages"][-1].content)
+    time.sleep(2)  # Add delay to prevent token exhaustion
     user_input = input("Enter your message: ")
