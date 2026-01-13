@@ -28,9 +28,12 @@ The primary use case involves a restaurant review analysis system that can answe
 
 - **Local AI Agent**: Question-answering system powered by Ollama's LLaMA 3.2 model
 - **RAG Pipeline**: Retrieval-augmented generation using ChromaDB vector store
+- **PDF RAG Agent**: Advanced RAG agent that answers questions from PDF documents
+- **ReAct Agent**: Reasoning and Acting agent with tool integration
+- **Drafter Agent**: Automated document drafting assistant
 - **Sentiment Analysis**: Multi-class sentiment classification using pre-trained BERT models
 - **Graph-Based Agents**: Stateful agent workflows implemented with LangGraph
-- **Vector Search**: Efficient semantic search over restaurant reviews using embeddings
+- **Vector Search**: Efficient semantic search over restaurant reviews and PDF documents using embeddings
 
 ## Project Structure
 
@@ -43,11 +46,18 @@ WIDS Project/
 │   │   ├── vector.py              # Vector store initialization and retrieval
 │   │   └── realistic_restaurant_reviews.csv  # Restaurant review dataset
 │   ├── Langgraph/
-│   │   ├── lang_graph1.py         # Basic LangGraph structure
-│   │   ├── lang_graph2.py         # Handling multiple inputs
-│   │   ├── lang_graph3.py         # Multiple nodes and edges
-│   │   ├── lang_graph4.py         # Conditional routing
-│   │   └── lang_graph5.py         # Interactive number guessing game
+│   │   ├── Agents/                # LangGraph tutorial series
+│   │   │   ├── lang_graph1.py     # Basic LangGraph structure
+│   │   │   ├── lang_graph2.py     # Handling multiple inputs
+│   │   │   ├── lang_graph3.py     # Multiple nodes and edges
+│   │   │   ├── lang_graph4.py     # Conditional routing
+│   │   │   └── lang_graph5.py     # Interactive number guessing game
+│   │   └── AI Agents/             # Advanced AI agent implementations
+│   │       ├── RAG_agent.py       # RAG agent with PDF document Q&A
+│   │       ├── ReAct_agent.py     # ReAct (Reasoning + Acting) agent
+│   │       ├── Drafter_agent.py   # Document drafting agent
+│   │       ├── Agent1.py          # Basic agent implementation
+│   │       └── leave_notification.txt  # Sample text document
 │   └── chroma_langchain_db/       # ChromaDB vector database storage
 ├── venv/                          # Python virtual environment
 ├── requirements.txt               # Project dependencies
@@ -92,9 +102,15 @@ Before running this project, ensure you have the following installed:
 
 3. Install required dependencies:
    ```bash
+   pip install -r requirements.txt
+   ```
+   
+   Or install manually:
+   ```bash
    pip install langchain langchain-ollama langchain-chroma langchain-core
-   pip install pandas transformers torch chromadb
-   pip install langgraph ipython
+   pip install langchain-groq langchain-huggingface langchain-community
+   pip install pandas transformers torch chromadb pypdf
+   pip install langgraph ipython python-dotenv
    ```
 
 ## Usage
@@ -125,10 +141,7 @@ python transformer.py
 ### Exploring LangGraph Tutorials
 
 The project includes progressive LangGraph tutorials demonstrating various concepts:
-
-**1. Basic Structure (lang_graph1.py)**
-```bash
-cd Scripts/Langgraph
+/Agents
 python lang_graph1.py
 ```
 Learn the simplest LangGraph structure with a single node.
@@ -157,35 +170,107 @@ python lang_graph5.py
 ```
 Build a complete interactive number guessing game with state management.
 
-## Components
+### Running Advanced AI Agents
 
-### 1. Langchain Components
+**RAG Agent with PDF Documents**
+```bash
+cd Scripts/Langgraph/AI\ Agents
+python RAG_agent.py
+```
+Ask questions about information contained in PDF documents. The agent retrieves relevant context from the PDF and generates accurate answers using RAG.
 
-#### Local AI Agent (`Langchain/local-ai-agent.py`)
+**ReAct Agent**
+```bash
+python ReAct_agent.py
+```
+Interact with an agent that uses the ReAct (Reasoning + Acting) framework to break down complex tasks, reason through problems, and take appropriate actions.
 
-Implements a RAG-based question-answering system that:
-- Retrieves relevant restaurant reviews from the vector database
-- Generates contextual answers using LLaMA 3.2
-- Provides an interactive command-line interface
+**Document Drafter Agent**
+```bash
+python Drafter_agent.py
+```
+Generate and draft professional documents with AI assistance.
 
-#### Vector Store (`Langchain/vector.py`)
-
-Handles:
-- CSV data ingestion from restaurant reviews
-- Document embedding using Ollama's mxbai-embed-large model
-- ChromaDB vector store initialization and management
-- Semantic similarity search with configurable retrieval parameters
-
-### 2. Sentiment Analysis (`transformer.py`)
-
-Demonstrates:
-- Pre-trained BERT-based sentiment classification
-- Multi-class rating prediction (1-5 stars)
-- Batch processing of review text
-
-### 3. LangGraph Learning Series (`Langgraph/`)
+**Basic Agent**
+```bash
+python Agent1.py
+```
+Explore fundamental agent architecture and implementation patterns
+python lang_graph5.py
+```
+Build a complete interactive number guessing game with state management.
+Agents/`)
 
 Progressive tutorials showcasing LangGraph capabilities:
+
+#### lang_graph1.py - Basic Structure
+- Single node graph implementation
+- Simple state management with TypedDict
+- Entry and finish point configuration
+
+#### lang_graph2.py - Multiple Inputs
+- Processing lists of values
+- Conditional operations (addition/multiplication)
+- Handling complex input structures
+
+#### lang_graph3.py - Sequential Workflow
+- Multi-node pipeline with edges
+- State transformation across nodes
+- Sequential data processing
+
+#### lang_graph4.py - Conditional Routing
+- Dynamic node routing based on state
+- Multiple conditional branches
+- Decision-making functions
+
+#### lang_graph5.py - Interactive Application
+- Complete game implementation (number guessing)
+- User interaction handling
+- Complex state management with multiple attributes
+- Iterative workflows with loop conditions
+
+### 4. Advanced AI Agents (`Langgraph/AI Agents/`)
+
+Production-ready AI agent implementations:
+
+#### RAG_agent.py - PDF Question-Answering Agent
+- PDF document loading and processing with PyPDFLoader
+- Text chunking with RecursiveCharacterTextSplitter
+- Vector embeddings using HuggingFace models (all-MiniLM-L6-v2)
+- ChromaDB integration for efficient document retrieval
+- LangGraph-based agent workflow with tool integration
+- Groq LLM integration (llama-3.3-70b-versatile)
+- Custom retrieval tool for semantic search
+- Error handling and validation for tool execution
+
+#### ReAct_agent.py - Reasoning & Acting Agent
+- ReAct framework implementation
+- Multi-step reasoning process
+- Tool selection and execution
+- Observation-based decision making
+- Chain-of-thought prompting
+
+#### Drafter_agent.py - Document Drafting Agent
+- Automated document generation
+- Template-based content creation
+- Context-aware writing assistance
+- Professional document formatting
+
+#### Agent1.py - Foundational Agent
+- Core agent architecture patterns
+- Basic state management
+- Message handling and routing
+- Simple tool integration example
+ProgGroq**: High-performance LLM inference API
+- **ChromaDB**: Vector database for embeddings storage and retrieval
+- **HuggingFace**: Embedding models and transformers
+Create a `.env` file in the project root for the AI Agents:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+Get your Groq API key from [https://console.groq.com](https://console.groq.com)
 
 #### lang_graph1.py - Basic Structure
 - Single node graph implementation
@@ -217,9 +302,17 @@ Progressive tutorials showcasing LangGraph capabilities:
 
 - **LangChain**: Framework for developing LLM-powered applications
 - **LangGraph**: Library for building stateful, multi-actor applications with LLMs
-- **Ollama**: Local LLM deployment platform
-- **ChromaDB**: Vector database for embeddings storage and retrieval
-- **Transformers**: Hugging Face library for pre-trained NLP models
+
+**Local Agents:**
+- LLM: `llama3.2` (via Ollama)
+- Embeddings: `mxbai-embed-large` (via Ollama)
+
+**Advanced AI Agents:**
+- LLM: `llama-3.3-70b-versatile` (via Groq API)
+- Embeddings: `sentence-transformers/all-MiniLM-L6-v2` (via HuggingFace)
+
+**Sentiment Analysis:**
+- ModelHugging Face library for pre-trained NLP models
 - **Pandas**: Data manipulation and analysis
 - **PyTorch**: Deep learning framework
 
