@@ -77,9 +77,10 @@ tool_node = ToolNode(tools=tools)
 graph.add_node("tools", tool_node)
 
 # Adding conditional edges based on whether the agent should continue or end
+
 graph.add_conditional_edges(
     "agent", # flows from agent node to tools node or the end, based on the condition.
-    should_continue,
+    should_continue, # conditional function
     {
         "continue": "tools",
         "end": END

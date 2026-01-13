@@ -13,30 +13,30 @@ class AgentState(TypedDict):
     final_number: int
     final_number2: int
 
-def add_node(state: AgentState) -> AgentState:
+def add_node(state: AgentState) -> AgentState: # addition node
     """ This node adds the first 2 numbers. """
 
     state["final_number"] = state["number1"] + state["number2"]
     return state
 
-def subtract_node(state: AgentState) -> AgentState:
+def subtract_node(state: AgentState) -> AgentState: # subtraction node
     """ This node subtracts the 2nd number from the 1st number. """
 
     state["final_number"] = state["number1"] - state["number2"]
     return state
 
-def add_node2(state: AgentState) -> AgentState:
+def add_node2(state: AgentState) -> AgentState: # addition node 2
     """ This node adds the 3rd and 4th numbers to the current final_number. """
 
     state["final_number2"] = state["number3"] + state["number4"]
     return state  
 
-def subtract_node2(state: AgentState) -> AgentState:
+def subtract_node2(state: AgentState) -> AgentState: # subtraction node 2
     """ This node subtracts the 4th number from the 3rd number. """
     state["final_number2"] = state["number3"] - state["number4"]
     return state
 
-def decide_next_node(state: AgentState) -> str:
+def decide_next_node(state: AgentState) -> str: # router node 1 (based on operation1)
     """ This node decides which operation to perform based on the operation1 value. """
 
     if state["operation1"] == "+":
@@ -44,7 +44,7 @@ def decide_next_node(state: AgentState) -> str:
     else:
         return "subtraction_operation"
 
-def decide_next_node2(state: AgentState) -> str:
+def decide_next_node2(state: AgentState) -> str: # router node 2 (based on operation2)
     """ This node decides which operation to perform based on the operation2 value. """
 
     if state["operation2"] == "+":
@@ -60,21 +60,22 @@ graph.add_node("add_node2", add_node2)
 graph.add_node("subtract_node2", subtract_node2)
 
 graph.add_node("decide_next_node", lambda state:state)
-graph.add_node("decide_next_node2", lambda state:state)
+graph.add_node("decide_next_node2", lambda state:state) 
+# since this is a router node, we cannot pass an action to it, we pass a lambda function that returns the state as is.
 
 graph.add_edge(START, "decide_next_node")
 
-graph.add_conditional_edges(
-    "decide_next_node",
-    decide_next_node,
+graph.add_conditional_edges( # adding conditional edges 
+    "decide_next_node", # source node
+    decide_next_node, # what action the node will perform
     {
-        "addition_operation": "add_node",
+        "addition_operation": "add_node", # edge: destination node
         "subtraction_operation": "subtract_node"
     }
 )
 
 graph.add_edge("add_node", "decide_next_node2")
-graph.add_edge("subtract_node", "decide_next_node2")
+graph.add_edge("subtract_node", "decide_next_node2") # adding edges to connect
 
 graph.add_conditional_edges(
     "decide_next_node2",
