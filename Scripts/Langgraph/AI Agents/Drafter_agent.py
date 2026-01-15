@@ -108,7 +108,7 @@ def should_continue(state: AgentState) -> str: # conditional settings for the ag
     return "continue"
 
 def print_messages(messages):
-    """Function I made to print the messages in a more readable format"""
+    """Function to print the messages in a more readable format"""
     if not messages: # if there are no messages, there is nothing to print; just return.
         return
     
