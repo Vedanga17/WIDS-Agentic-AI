@@ -12,7 +12,7 @@ template = """
 """
 
 prompt = ChatPromptTemplate.from_template(template)
-chain = prompt | model # forming the chain
+chain = prompt | model # forming the chain (pipeline)
 
 while True:
     question = input("Ask a question about the pizza restaurant (q to quit): ")
