@@ -27,6 +27,7 @@ The primary use case involves a restaurant review analysis system that can answe
 ## Features
 
 - **Local AI Agent**: Question-answering system powered by Ollama's LLaMA 3.2 model
+- **Google ADK Agents**: Implementation of agents using Google's Agent Development Kit (ADK) with Gemini models
 - **RAG Pipeline**: Retrieval-augmented generation using ChromaDB vector store
 - **PDF RAG Agent**: Advanced RAG agent that answers questions from PDF documents
 - **ReAct Agent**: Reasoning and Acting agent with tool integration
@@ -41,6 +42,13 @@ The primary use case involves a restaurant review analysis system that can answe
 WIDS Project/
 ├── Scripts/
 │   ├── transformer.py             # Sentiment analysis experiments
+│   ├── ADK_Google/                # Google Agent Development Kit (ADK) implementations
+│   │   ├── 1-Basic_Agent/
+│   │   │   └── greeting_agent/    # Basic greeting agent with Gemini 2.5 Flash
+│   │   ├── 2-Tool_Agent/
+│   │   │   └── tool_agent/        # Agent with custom tools (factorial, current time)
+│   │   └── 3-2nd_Agent/
+│   │       └── wheel_fortunate_agent/  # Interactive fortune wheel game agent
 │   ├── Langchain/
 │   │   ├── local-ai-agent.py      # RAG-based Q&A system for restaurant reviews
 │   │   ├── vector.py              # Vector store initialization and retrieval
@@ -113,6 +121,11 @@ Before running this project, ensure you have the following installed:
    pip install langgraph ipython python-dotenv
    ```
 
+4. (Optional) Install Google ADK for ADK agent examples:
+   ```bash
+   pip install google-adk
+   ```
+
 ## Usage
 
 ### Running the Restaurant Review Q&A Agent
@@ -136,6 +149,45 @@ Run sentiment analysis experiments on movie reviews:
 ```bash
 cd Scripts
 python transformer.py
+```
+
+### Running Google ADK Agents
+
+The project includes implementations using Google's Agent Development Kit (ADK) with Gemini models:
+
+#### 1. Basic Greeting Agent
+```bash
+cd Scripts/ADK_Google/1-Basic_Agent/greeting_agent
+adk run
+```
+A simple conversational agent that:
+- Greets users and asks for their name
+- Provides personalized greetings using Gemini 2.5 Flash
+- Demonstrates basic ADK agent setup
+
+#### 2. Tool-Enabled Agent
+```bash
+cd Scripts/ADK_Google/2-Tool_Agent/tool_agent
+adk run
+```
+An agent with custom tool integration that can:
+- Calculate factorial of numbers
+- Get current time in formatted output
+- Demonstrates how to create and integrate custom Python functions as tools
+
+#### 3. Wheel of Fortune Agent
+```bash
+cd Scripts/ADK_Google/3-2nd_Agent/wheel_fortunate_agent
+adk run
+```
+An interactive game agent that:
+- Spins a fortune wheel for random positive outcomes
+- Displays prizes like free trips, cash, or celebrity meet-and-greets
+- Shows how to handle random selection and explicit tool output
+
+**Note:** These agents require Google ADK installation. Install with:
+```bash
+pip install google-adk
 ```
 
 ### Exploring LangGraph Tutorials
@@ -200,6 +252,101 @@ python lang_graph5.py
 ```
 Build a complete interactive number guessing game with state management.
 Agents/`)
+
+Progressive tutorials showcasing LangGraph capabilities:
+
+#### lang_graph1.py - Basic Structure
+- Single node graph implementation
+- Simple state management with TypedDict
+- Entry and finish point configuration
+
+#### lang_graph2.py - Multiple Inputs
+- Processing lists of values
+- Conditional operations (addition/multiplication)
+- Handling complex input structures
+
+#### lang_graph3.py - Sequential Workflow
+- Multi-node pipeline with edges
+- State transformation across nodes
+- Sequential data processing
+
+#### lang_graph4.py - Conditional Routing
+- Dynamic node routing based on state
+- Multiple conditional branches
+- Decision-making functions
+
+#### lang_graph5.py - Interactive Application
+- Complete game implementation (number guessing)
+- User interaction handling
+- Complex state management with multiple attributes
+- Iterative workflows with loop conditions
+
+## Components
+
+### 1. Google ADK Agents (`ADK_Google/`)
+
+Google Agent Development Kit (ADK) implementations using Gemini models for various interactive tasks:
+
+#### 1-Basic_Agent/greeting_agent
+A foundational conversational agent demonstrating basic ADK setup and interaction patterns.
+
+**Features:**
+- Model: `gemini-2.5-flash`
+- Greets users and collects their name
+- Provides personalized greetings
+- Clean agent architecture using ADK's Agent class
+- Entry point to understanding Google ADK framework
+
+**Use Case:** Simple chatbot that engages users with friendly conversation
+
+#### 2-Tool_Agent/tool_agent
+Advanced agent showcasing custom tool integration and multi-capability systems.
+
+**Custom Tools:**
+- `get_current_time()`: Returns formatted current timestamp
+- `factorial()`: Calculates factorial of any given number
+
+**Features:**
+- Model: `gemini-2.5-flash`
+- Demonstrates creating Python functions as agent tools
+- Tool selection and execution handling
+- Multi-tool architecture in single agent
+- Shows how to extend agent capabilities with custom logic
+
+**Use Case:** Utility assistant that can perform calculations and provide time information
+
+#### 3-2nd_Agent/wheel_fortunate_agent
+Interactive fortune wheel game demonstrating random selection and explicit tool output display.
+
+**Custom Tools:**
+- `fortunate_wheel()`: Randomly selects from three exciting outcomes:
+  - Free trip to the Bahamas with coupons
+  - $5000 cash prize
+  - Celebrity meet-and-greet experience
+
+**Features:**
+- Model: `gemini-2.5-flash-lite` (optimized lightweight model)
+- Random outcome generation using Python's random module
+- Explicit instructions for tool result display
+- Entertainment-focused interactive experience
+- Critical output handling to ensure user sees results
+
+**Use Case:** Fun interactive game that provides users with positive random outcomes
+
+### 2. Sentiment Analysis (`transformer.py`)
+
+Multi-class sentiment classification system for analyzing movie reviews and general text.
+
+**Features:**
+- Uses BERT-based pre-trained model: `nlptown/bert-base-multilingual-uncased-sentiment`
+- 5-class sentiment classification (1-5 stars)
+- Token classification and analysis
+- PyTorch-based implementation
+- HuggingFace Transformers integration
+
+**Use Case:** Analyze customer reviews, social media sentiment, or any text-based feedback
+
+### 3. LangGraph Tutorials (`Langgraph/Agents/`)
 
 Progressive tutorials showcasing LangGraph capabilities:
 
@@ -302,6 +449,18 @@ Get your Groq API key from [https://console.groq.com](https://console.groq.com)
 
 - **LangChain**: Framework for developing LLM-powered applications
 - **LangGraph**: Library for building stateful, multi-actor applications with LLMs
+- **Google ADK**: Google's Agent Development Kit for building AI agents with Gemini models
+- **Groq**: High-performance LLM inference API
+- **ChromaDB**: Vector database for embeddings storage and retrieval
+- **HuggingFace**: Embedding models and transformers library
+- **Transformers**: Pre-trained NLP models for sentiment analysis
+- **Pandas**: Data manipulation and analysis
+- **PyTorch**: Deep learning framework
+
+**Google ADK Agents:**
+- LLM: `gemini-2.5-flash` and `gemini-2.5-flash-lite` (via Google ADK)
+- Custom tool integration with Python functions
+- Interactive agent workflows
 
 **Local Agents:**
 - LLM: `llama3.2` (via Ollama)
