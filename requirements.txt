@@ -3,12 +3,21 @@ langchain>=0.1.0
 langchain-ollama>=0.1.0
 langchain-chroma>=0.1.0
 langchain-core>=0.1.0
+langchain-groq>=0.1.0
+langchain-huggingface>=0.0.1
+langchain-community>=0.0.20
 
 # Graph-based Agent Framework
 langgraph>=0.0.40
 
+# Google Agent Development Kit
+google-adk>=0.1.0
+
 # Vector Database
 chromadb>=0.4.22
+
+# PDF Processing
+pypdf>=3.17.0
 
 # Data Processing
 pandas>=2.0.0
@@ -16,6 +25,10 @@ pandas>=2.0.0
 # Machine Learning and NLP
 transformers>=4.35.0
 torch>=2.0.0
+sentence-transformers>=2.2.0
+
+# Environment Variables
+python-dotenv>=1.0.0
 
 # Jupyter Support
 ipython>=8.12.0
