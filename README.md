@@ -65,7 +65,11 @@ WIDS Project/
 │   │       ├── ReAct_agent.py     # ReAct (Reasoning + Acting) agent
 │   │       ├── Drafter_agent.py   # Document drafting agent
 │   │       ├── Agent1.py          # Basic agent implementation
-│   │       └── leave_notification.txt  # Sample text document
+│   │       ├── leave_notification.txt  # Sample text document
+│   │       └── Assignment_2/      # Assignment implementations
+│   │           ├── Assn2_Q1.py    # Conversational agent with message history
+│   │           ├── Assn2_Q2.py    # Two-step analyzer-generator agent
+│   │           └── Assn2_Q3.py    # Router agent with domain experts
 │   └── chroma_langchain_db/       # ChromaDB vector database storage
 ├── venv/                          # Python virtual environment
 ├── requirements.txt               # Project dependencies
@@ -247,7 +251,33 @@ Generate and draft professional documents with AI assistance.
 ```bash
 python Agent1.py
 ```
-Explore fundamental agent architecture and implementation patterns
+Explore fundamental agent architecture and implementation patterns.
+
+### Running Assignment 2 Solutions
+
+These assignments demonstrate practical LangGraph implementations:
+
+**Assignment 2 Question 1 - Conversational Agent**
+```bash
+cd Scripts/Langgraph/AI\ Agents/Assignment_2
+python Assn2_Q1.py
+```
+Interact with a conversational agent that maintains context across multiple exchanges. Ask questions about math, coding, or general knowledge.
+
+**Assignment 2 Question 2 - Analyzer-Generator Pipeline**
+```bash
+python Assn2_Q2.py
+```
+Watch as your complex questions are first simplified by an analyzer agent, then answered by a generator agent in a two-step process.
+
+**Assignment 2 Question 3 - Smart Router Agent**
+```bash
+python Assn2_Q3.py
+```
+Ask Python programming or general knowledge questions - the router intelligently directs your query to the appropriate expert agent.
+
+**Note:** All Assignment 2 agents require a Groq API key in your `.env` file.
+
 python lang_graph5.py
 ```
 Build a complete interactive number guessing game with state management.
@@ -408,6 +438,58 @@ Production-ready AI agent implementations:
 - Basic state management
 - Message handling and routing
 - Simple tool integration example
+
+#### Assignment_2/ - LangGraph Assignment Solutions
+
+Practical assignments demonstrating progressive LangGraph concepts:
+
+**Assn2_Q1.py - Conversational Agent with Context**
+- Simple LangGraph application with Groq LLM (llama-3.3-70b-versatile)
+- Maintains conversation history for contextual responses
+- Continuous chat loop with message accumulation
+- Handles multi-turn conversations with AI and human messages
+- Expert in math, coding, and general knowledge domains
+
+**Key Features:**
+- Message history tracking (HumanMessage and AIMessage)
+- State management with TypedDict
+- Context-aware responses using accumulated chat history
+- Interactive loop until user exits
+
+**Assn2_Q2.py - Two-Step Analyzer-Generator Pipeline**
+- Multi-agent workflow with question analysis and answer generation
+- Sequential processing: Analyzer → Generator
+- Demonstrates agent chaining and state passing
+
+**Architecture:**
+1. **Question Analyzer**: Simplifies complex questions while retaining meaning
+2. **Answer Generator**: Provides detailed answers to simplified questions
+
+**Key Features:**
+- SystemMessage integration for agent instructions
+- State propagation between agents
+- Question rewriting without answering
+- Specialized agents with distinct roles
+
+**Assn2_Q3.py - Intelligent Router with Domain Experts**
+- Conditional routing based on question classification
+- LLM-powered decision making for expert selection
+- Demonstrates dynamic workflow routing
+
+**Architecture:**
+1. **Router Agent**: Classifies questions using LLM (Python vs General)
+2. **Python Expert**: Handles Python programming questions
+3. **General Expert**: Handles general knowledge questions
+
+**Key Features:**
+- Intelligent LLM-based question classification
+- Conditional edges with `decide_expert` function
+- Domain-specific expert agents
+- Dynamic routing to appropriate specialist
+- START and END node usage
+
+**Use Case:** Demonstrates practical LangGraph patterns for building multi-agent systems with routing logic
+
 ProgGroq**: High-performance LLM inference API
 - **ChromaDB**: Vector database for embeddings storage and retrieval
 - **HuggingFace**: Embedding models and transformers
