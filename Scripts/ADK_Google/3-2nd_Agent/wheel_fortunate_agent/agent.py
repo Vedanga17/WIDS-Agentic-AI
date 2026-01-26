@@ -21,5 +21,5 @@ root_agent = Agent(
     DO NOT STAY SILENT, actually DISPLAY the outcome. 
 
     Provided tools: fortunate_wheel""", # giving the agent very specific instructions
-    tools=[fortunate_wheel]
+    tools=[fortunate_wheel] # passing the list of available tools 
 )
