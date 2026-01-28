@@ -2,7 +2,7 @@ import uuid # for generating unique, random session IDs
 import asyncio # for async programming (handling network delays, waiting, etc); I/O operations involved (get_session, create_session)
 
 from dotenv import load_dotenv
-from google.adk.sessions import InMemorySessionService # for creating a session within ADK
+from google.adk.sessions import InMemorySessionService # for creating a session (in memory) within ADK
 from google.genai import types
 from google.adk.runners import Runner # the 'runner' combines: session and agent(s), critical for ACTUALLY running the code
 from question_answer_agent import question_answer_agent # importing agent defined in agent.py
@@ -49,7 +49,7 @@ async def main():
     session_service=session_service_new,
     )
 
-    question = input("Ask your question about Newton's famous laws:")
+    question = input("Ask your question about Newton's famous laws: ")
 
 # storing the question and its contents in a variable to be passed to the runner
 
@@ -63,7 +63,7 @@ async def main():
     session_id=SESSION_ID,
     new_message=message,
 ):
-        if event.is_final_response(): # if it's the final event (and thus response), print the final response and its contents, if not empty
+        if event.is_final_response(): # if it's the final event (and thus response), print the final response and its contents (if not empty)
             if event.content and event.content.parts:
                 print(f"Final Response: {event.content.parts[0].text}")
 
