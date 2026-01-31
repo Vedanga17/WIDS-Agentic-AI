@@ -1,6 +1,6 @@
 # WIDS Agentic AI Project
 
-A comprehensive exploration of agentic AI systems developed as part of the Winter in Data Science (WIDS) program at IIT Bombay. This project implements various AI agent architectures, including retrieval-augmented generation (RAG), sentiment analysis, and graph-based agent workflows using modern frameworks like LangChain and LangGraph.
+A comprehensive exploration of agentic AI systems developed as part of the Winter in Data Science (WIDS) program at IIT Bombay. This project implements various AI agent architectures, including Google ADK-based agents with Gemini models, retrieval-augmented generation (RAG), multi-agent hierarchical systems, transformer-based NLP tasks (sentiment analysis, text generation, summarization), and graph-based agent workflows using modern frameworks like Google ADK, LangChain, and LangGraph.
 
 ## Table of Contents
 
@@ -16,13 +16,36 @@ A comprehensive exploration of agentic AI systems developed as part of the Winte
 
 ## Overview
 
-This project demonstrates the implementation of intelligent AI agents capable of:
-- Answering domain-specific questions using RAG (Retrieval-Augmented Generation)
-- Performing sentiment analysis on textual data
-- Building stateful agent workflows with LangGraph
-- Managing vector embeddings with ChromaDB for efficient information retrieval
+This project demonstrates the implementation of intelligent AI agents spanning multiple frameworks and paradigms:
 
-The primary use case involves a restaurant review analysis system that can answer questions about customer experiences using a combination of vector search and large language models.
+**Google ADK Agent Architectures:**
+- Basic conversational agents with Gemini 2.5 Flash models
+- Tool-enabled agents with custom Python functions (factorial, time retrieval)
+- Structured output agents using Pydantic schemas for JSON validation
+- Session-based agents with state management and contextual information
+- Multi-agent hierarchical systems with intelligent delegation and coordination
+- Real-time financial data integration with yfinance for stock price retrieval
+
+**LangChain & LangGraph Implementations:**
+- Retrieval-Augmented Generation (RAG) for domain-specific question answering
+- PDF document processing and question answering with vector search
+- ReAct (Reasoning + Acting) agents with mathematical tool integration
+- Document drafting agents with iterative refinement capabilities
+- Router agents with domain expert specialization
+- Stateful multi-step workflows with conditional routing
+- Interactive conversational agents with message history
+
+**Transformer-Based NLP Tasks:**
+- Multi-class sentiment analysis using BERT (5-star rating classification)
+- Creative text generation with GPT-2 (autoregressive continuation)
+- Abstractive text summarization with BART (intelligent condensation)
+
+**Vector Search & Embeddings:**
+- ChromaDB integration for semantic document retrieval
+- Restaurant review analysis system with top-k retrieval
+- Efficient embedding management and persistent vector stores
+
+The project progresses from foundational agent concepts to sophisticated multi-agent systems, demonstrating practical applications including customer review analysis, biographical information retrieval, real-time financial queries, and automated document generation.
 
 ## Features
 
