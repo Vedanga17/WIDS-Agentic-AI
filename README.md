@@ -1,6 +1,6 @@
-# WIDS Agentic AI Project
+# WiDS Agentic AI Project
 
-A comprehensive exploration of agentic AI systems developed as part of the Winter in Data Science (WIDS) program at IIT Bombay. This project implements various AI agent architectures, including Google ADK-based agents with Gemini models, retrieval-augmented generation (RAG), multi-agent hierarchical systems, transformer-based NLP tasks (sentiment analysis, text generation, summarization), and graph-based agent workflows using modern frameworks like Google ADK, LangChain, and LangGraph.
+A comprehensive exploration of agentic AI systems developed as part of the Winter in Data Science (WiDS) program at IIT Bombay. This project implements various AI agent architectures, including Google ADK-based agents with Gemini models, retrieval-augmented generation (RAG), multi-agent hierarchical systems, transformer-based NLP tasks (sentiment analysis, text generation, summarization), and graph-based agent workflows using modern frameworks like Google ADK, LangChain, and LangGraph.
 
 ## Table of Contents
 
@@ -901,7 +901,7 @@ This project is part of the IIT Bombay WIDS program. Please refer to your instit
 
 ---
 
-**Author**: Vedanga  
+**Author**: Vedanga Gupta
 **Institution**: IIT Bombay  
-**Program**: Winter in Data Science (WIDS)  
+**Program**: Winter in Data Science (WiDS)  
 **Year**: 2025-26
