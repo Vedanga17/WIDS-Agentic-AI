@@ -1,0 +1,889 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{WIDS Agentic AI Project}
+\lhead{IIT Bombay}
+\rfoot{Page \thepage}
+
+% Title formatting
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\huge\bfseries WIDS Agentic AI Project Report\par}
+    \vspace{1.5cm}
+    
+    {\Large A Comprehensive Exploration of Intelligent Agent Systems\par}
+    \vspace{2cm}
+    
+    {\large Winter in Data Science (WIDS) Program\par}
+    {\large IIT Bombay\par}
+    \vspace{2cm}
+    
+    {\large January 2026\par}
+    
+    \vfill
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+\section{Abstract}
+
+This report presents a comprehensive exploration of agentic AI systems developed as part of the Winter in Data Science (WIDS) program at IIT Bombay. The project implements various AI agent architectures spanning multiple frameworks including Google's Agent Development Kit (ADK), LangChain, and LangGraph. The implementations demonstrate fundamental to advanced agent capabilities including retrieval-augmented generation (RAG), reasoning and acting (ReAct) agents, tool-using agents, stateful workflows, and transformer-based NLP tasks. The project serves as both an educational journey through modern AI agent development and a practical showcase of production-ready agent systems capable of real-world applications.
+
+\section{Introduction}
+
+\subsection{Motivation and Background}
+
+Agentic AI represents a paradigm shift in artificial intelligence, moving beyond static question-answering systems to autonomous agents capable of reasoning, planning, tool usage, and maintaining conversational context. This project explores the full spectrum of agent architectures, from basic conversational agents to sophisticated multi-agent systems with specialized domain expertise.
+
+\subsection{Project Objectives}
+
+The primary objectives of this project include:
+\begin{itemize}
+    \item Understanding fundamental agent architectures and state management
+    \item Implementing tool-using agents with custom and built-in functions
+    \item Building retrieval-augmented generation (RAG) systems for knowledge-intensive tasks
+    \item Creating stateful agent workflows with conditional routing
+    \item Exploring graph-based agent orchestration using LangGraph
+    \item Developing transformer-based NLP pipelines for sentiment analysis and text generation
+    \item Implementing multi-agent systems with specialized expertise domains
+\end{itemize}
+
+\subsection{Technology Stack}
+
+The project leverages a comprehensive technology stack:
+\begin{itemize}
+    \item \textbf{Language Models}: Google Gemini 2.5 Flash, LLaMA 3.2, LLaMA 3.3 (70B), GPT-2, BERT-based models
+    \item \textbf{Agent Frameworks}: Google ADK, LangChain, LangGraph
+    \item \textbf{Vector Databases}: ChromaDB for semantic search and retrieval
+    \item \textbf{Embeddings}: Ollama mxbai-embed-large, HuggingFace sentence-transformers
+    \item \textbf{NLP Libraries}: Transformers (HuggingFace), PyTorch
+    \item \textbf{LLM Providers}: Groq API, Ollama (local inference)
+\end{itemize}
+
+\section{Google Agent Development Kit (ADK) Implementations}
+
+\subsection{Architecture Overview}
+
+The Google ADK provides a streamlined framework for building agents powered by Gemini models. The ADK implementations progress from basic conversational agents to sophisticated tool-using and session-based agents with structured outputs.
+
+\subsection{Basic Greeting Agent}
+
+The foundational agent demonstrates core ADK concepts:
+\begin{itemize}
+    \item \textbf{Model}: Gemini 2.5 Flash
+    \item \textbf{Functionality}: Greets users and maintains basic conversational flow
+    \item \textbf{Key Learning}: Agent naming conventions, instruction specification through docstrings
+\end{itemize}
+
+\subsection{Tool-Using Agent}
+
+This agent showcases integration of custom tools with ADK:
+\begin{itemize}
+    \item \textbf{Custom Tools Implemented}:
+    \begin{itemize}
+        \item \texttt{get\_current\_time()}: Returns current timestamp in formatted string
+        \item \texttt{factorial(n)}: Computes factorial of a given number
+    \end{itemize}
+    \item \textbf{Key Insight}: ADK restricts mixing custom tools with built-in tools in a single agent
+    \item \textbf{Tool Discovery}: Agents use docstrings to understand tool capabilities and appropriate usage contexts
+\end{itemize}
+
+\subsection{Wheel of Fortune Agent}
+
+An interactive entertainment agent demonstrating:
+\begin{itemize}
+    \item Random outcome selection from predefined options
+    \item Critical importance of explicit output instructions to prevent silent tool calls
+    \item User engagement through gamification
+\end{itemize}
+
+\subsection{Structured Output Agent}
+
+This agent introduces schema-driven responses using Pydantic:
+\begin{itemize}
+    \item \textbf{Task}: Generate 50-word paragraphs on user-specified topics
+    \item \textbf{Output Schema}: Defined using Pydantic \texttt{BaseModel} with field descriptions
+    \item \textbf{JSON Enforcement}: Instructions explicitly mandate JSON-formatted responses
+    \item \textbf{Constraints}: Word count limits (45-65 words), grammatical quality requirements
+    \item \textbf{Key Feature}: Uses \texttt{LlmAgent} class with \texttt{output\_schema} parameter
+\end{itemize}
+
+\subsection{Session-Based Agent}
+
+Advanced state management demonstrated through:
+\begin{itemize}
+    \item \textbf{State Variables}: Mathematician name and associated theorems/formulae
+    \item \textbf{Contextual Responses}: Answers questions based on pre-loaded state
+    \item \textbf{Selective Output}: Returns only specifically requested information
+    \item \textbf{Architecture}: Separation of agent definition and session management
+\end{itemize}
+
+\subsection{Multi-Agent Manager System}
+
+A sophisticated hierarchical agent architecture demonstrating agent coordination and delegation:
+
+\subsubsection{System Architecture}
+
+The multi-agent system consists of a manager agent coordinating specialized sub-agents and custom tools:
+
+\textbf{Manager Agent (Root Agent):}
+\begin{itemize}
+    \item \textbf{Model}: Gemini 2.5 Flash Lite
+    \item \textbf{Role}: Intelligent request routing and coordination
+    \item \textbf{Capabilities}: Analyzes user queries and delegates to appropriate sub-agents or invokes tools
+    \item \textbf{Response Synthesis}: Collects results from sub-agents/tools and formats user-friendly responses
+\end{itemize}
+
+\subsubsection{Sub-Agent 1: Basic Math Agent}
+
+Specialized arithmetic computation agent:
+\begin{itemize}
+    \item \textbf{Purpose}: Solve basic mathematical operations
+    \item \textbf{Custom Tools Implemented}:
+    \begin{itemize}
+        \item \texttt{Add(a, b)}: Integer addition
+        \item \texttt{Subtract(a, b)}: Integer subtraction
+        \item \texttt{Multiply(a, b)}: Integer multiplication
+        \item \texttt{Divide(a, b)}: Integer division with zero-division handling
+    \end{itemize}
+    \item \textbf{Delegation Protocol}: Accepts math queries, returns results in structured format
+    \item \textbf{Handoff Mechanism}: Returns control to manager for non-mathematical queries
+\end{itemize}
+
+\subsubsection{Sub-Agent 2: Date of Birth Agent}
+
+Web-search enabled information retrieval agent:
+\begin{itemize}
+    \item \textbf{Purpose}: Find birth dates of famous personalities
+    \item \textbf{Built-in Tool}: Google Search Tool for web queries
+    \item \textbf{Output Format}: Structured JSON with name and date (DD/MM/YYYY)
+    \item \textbf{Search Strategy}: Formulates optimal search queries for biographical information
+    \item \textbf{Tool Integration}: Demonstrates mixing built-in ADK tools within sub-agents
+\end{itemize}
+
+\subsubsection{Custom Tool: Stock Price Retriever}
+
+Manager-level tool for financial data:
+\begin{itemize}
+    \item \textbf{Implementation}: yfinance library integration
+    \item \textbf{Functionality}: Fetches current stock prices for user-specified symbols
+    \item \textbf{Data Pipeline}:
+    \begin{enumerate}
+        \item Creates yfinance Ticker object from stock symbol
+        \item Retrieves 1-day historical data
+        \item Extracts latest closing price
+        \item Returns formatted price string with 2 decimal precision
+    \end{enumerate}
+    \item \textbf{Error Handling}: Manages invalid symbols and market data availability
+\end{itemize}
+
+\subsubsection{Key Design Patterns}
+
+\textbf{Hierarchical Delegation:}
+\begin{itemize}
+    \item Manager analyzes query intent
+    \item Routes to specialized sub-agent or invokes direct tool
+    \item Sub-agents handle domain-specific logic independently
+    \item Results flow back through manager for response synthesis
+\end{itemize}
+
+\textbf{Explicit Response Instructions:}
+\begin{itemize}
+    \item Critical instructions prevent silent tool execution
+    \item Example-based guidance for response formatting
+    \item Mandate to display results to users explicitly
+    \item User-friendly output formatting requirements
+\end{itemize}
+
+\textbf{Responsibility Handoff:}
+\begin{itemize}
+    \item Sub-agents recognize out-of-scope queries
+    \item Return control to manager for re-routing
+    \item Enables multi-turn conversations across domains
+    \item Maintains system flexibility and extensibility
+\end{itemize}
+
+\textbf{Tool vs. Sub-Agent Decision:}
+\begin{itemize}
+    \item Direct tools (stock price): Simple, single-purpose functions
+    \item Sub-agents (math, DOB): Complex logic, multiple tools, specialized instructions
+    \item Sub-agents manage their own tool ecosystems
+    \item Manager abstracts sub-agent complexity
+\end{itemize}
+
+\subsubsection{Technical Insights}
+
+\textbf{Import Path Management:}
+\begin{itemize}
+    \item Sub-agents organized as packages with \texttt{agent.py} modules
+    \item Relative imports: \texttt{.sub\_agents.basic\_math.agent}
+    \item Proper export of agent objects for manager access
+\end{itemize}
+
+\textbf{Tool Import Specificity:}
+\begin{itemize}
+    \item Built-in tools require explicit imports: \texttt{from google.adk.tools.google\_search import google\_search}
+    \item Importing tool modules vs. tool objects distinction critical
+    \item Type validation ensures proper tool registration
+\end{itemize}
+
+\textbf{Root Agent Naming:}
+\begin{itemize}
+    \item ADK convention requires \texttt{root\_agent} variable name
+    \item Manager agent serves as system entry point
+    \item Agent name parameter must match folder structure
+\end{itemize}
+
+\textbf{Automatic Function Calling (AFC):}
+\begin{itemize}
+    \item AFC enabled with configurable max remote calls (default: 10)
+    \item Enables tool chaining and nested agent delegation
+    \item Supports complex multi-step workflows without manual intervention
+\end{itemize}
+
+\section{LangChain Implementation}
+
+\subsection{Architecture and Components}
+
+The LangChain implementation focuses on retrieval-augmented generation for domain-specific question answering using restaurant reviews.
+
+\subsection{Vector Store Construction}
+
+The vector database creation pipeline:
+\begin{itemize}
+    \item \textbf{Data Source}: CSV file containing realistic restaurant reviews with ratings, dates, titles, and review text
+    \item \textbf{Embedding Model}: Ollama mxbai-embed-large for high-quality semantic embeddings
+    \item \textbf{Document Structure}: Each review combines title and review text with metadata (rating, date)
+    \item \textbf{Vector Store}: ChromaDB with persistent storage to avoid re-indexing
+    \item \textbf{Retrieval Strategy}: Top-k retrieval with k=5 for relevant context
+\end{itemize}
+
+\subsection{RAG Question-Answering System}
+
+The local AI agent implements a complete RAG pipeline:
+\begin{itemize}
+    \item \textbf{Model}: LLaMA 3.2 via Ollama for local inference
+    \item \textbf{Prompt Template}: Specialized template for restaurant review analysis
+    \item \textbf{Chain Architecture}: Prompt template piped to LLM for streamlined inference
+    \item \textbf{Workflow}:
+    \begin{enumerate}
+        \item User inputs question about restaurant
+        \item Retriever fetches top 5 relevant reviews
+        \item LLM synthesizes answer based on retrieved context
+        \item Response grounded in actual review content
+    \end{enumerate}
+    \item \textbf{Interactive Interface}: Continuous query loop with exit commands
+\end{itemize}
+
+\section{LangGraph Implementations}
+
+\subsection{Framework Overview}
+
+LangGraph enables creation of stateful, multi-step agent workflows through directed graph structures. The implementations progress from simple linear flows to complex conditional routing and multi-agent systems.
+
+\subsection{Tutorial Series: Foundational Concepts}
+
+\subsubsection{Basic Graph Structure (lang\_graph1)}
+\begin{itemize}
+    \item Simple single-node graph demonstrating state mutation
+    \item Complimenting agent appending text to user name
+    \item Introduction to \texttt{StateGraph}, entry points, and finish points
+\end{itemize}
+
+\subsubsection{Multi-Input Handling (lang\_graph2)}
+\begin{itemize}
+    \item Processing multiple state variables simultaneously
+    \item Demonstrating state preservation across node execution
+\end{itemize}
+
+\subsubsection{Multi-Node Workflows (lang\_graph3)}
+\begin{itemize}
+    \item Sequential node execution with state passing
+    \item Edge connections defining execution flow
+    \item State accumulation across processing steps
+\end{itemize}
+
+\subsubsection{Conditional Routing (lang\_graph4)}
+\begin{itemize}
+    \item Dynamic edge selection based on state evaluation
+    \item Introduction to conditional edges and routing functions
+    \item Branching execution paths
+\end{itemize}
+
+\subsubsection{Interactive Number Guessing Game (lang\_graph5)}
+\begin{itemize}
+    \item Stateful multi-turn interaction
+    \item Game logic with feedback loops
+    \item Practical application of conditional edges
+\end{itemize}
+
+\subsection{Advanced AI Agents}
+
+\subsubsection{RAG Agent with PDF Document Processing}
+
+This sophisticated agent answers questions from PDF documents:
+
+\textbf{Document Processing Pipeline:}
+\begin{itemize}
+    \item PDF loading using PyPDFLoader
+    \item Page-level document chunking
+    \item Recursive character text splitting (800 character chunks, 150 character overlap)
+    \item HuggingFace embeddings (sentence-transformers/all-MiniLM-L6-v2)
+    \item ChromaDB vector store with persistent storage
+\end{itemize}
+
+\textbf{Agent Architecture:}
+\begin{itemize}
+    \item \textbf{Model}: LLaMA 3.3 70B via Groq API (temperature=0 for factual accuracy)
+    \item \textbf{Retriever Tool}: Custom tool fetching top 4 relevant chunks
+    \item \textbf{Tool Binding}: LLM equipped with retriever tool for autonomous information access
+    \item \textbf{System Prompt}: Specialized for SkillX Quant Finance Session documentation
+    \item \textbf{Citation Requirement}: Explicit instruction to cite source document chunks
+\end{itemize}
+
+\textbf{Graph Structure:}
+\begin{itemize}
+    \item LLM Agent Node: Processes queries and decides tool usage
+    \item Retriever Agent Node: Executes tool calls and fetches documents
+    \item Conditional Edge: Routes based on presence of tool calls
+    \item Feedback Loop: Retriever results flow back to LLM for answer synthesis
+\end{itemize}
+
+\subsubsection{ReAct Agent (Reasoning + Acting)}
+
+The ReAct agent implements the reasoning-and-acting paradigm:
+
+\textbf{Mathematical Tools:}
+\begin{itemize}
+    \item Addition, subtraction, multiplication, exponentiation
+    \item Tool docstrings enable LLM to understand capabilities
+\end{itemize}
+
+\textbf{Agent Workflow:}
+\begin{itemize}
+    \item User query analysis and decomposition
+    \item Tool selection based on reasoning
+    \item Tool execution via ToolNode
+    \item Result incorporation into response
+    \item System prompt ensures calculation results appear in final answers
+\end{itemize}
+
+\textbf{Technical Implementation:}
+\begin{itemize}
+    \item State management with message history
+    \item Conditional edges for tool invocation decisions
+    \item Pretty printing for user-friendly output
+    \item Continuous interaction loop with exit mechanism
+\end{itemize}
+
+\subsubsection{Document Drafter Agent}
+
+An intelligent writing assistant with document management capabilities:
+
+\textbf{Core Tools:}
+\begin{itemize}
+    \item \texttt{update(content)}: Replaces document content with new version
+    \item \texttt{save(filename)}: Persists document to text file and terminates session
+\end{itemize}
+
+\textbf{State Management:}
+\begin{itemize}
+    \item Global \texttt{document\_content} variable tracking current draft
+    \item System prompt displays current document state
+    \item Message history maintains conversational context
+\end{itemize}
+
+\textbf{Interaction Flow:}
+\begin{itemize}
+    \item Initial greeting and purpose explanation
+    \item User provides content creation/modification instructions
+    \item Agent uses update tool for iterative refinement
+    \item Document state displayed after each modification
+    \item Save tool triggers termination via conditional edge
+\end{itemize}
+
+\textbf{Conditional Logic:}
+\begin{itemize}
+    \item \texttt{should\_continue()} examines recent tool messages
+    \item Detection of ``saved'' and ``document'' keywords in tool output
+    \item Automatic termination upon successful save operation
+\end{itemize}
+
+\subsection{Assignment Implementations}
+
+\subsubsection{Assignment 2 Question 1: Conversational Agent with Memory}
+
+\textbf{Objective:} Build a conversational agent maintaining full chat history
+
+\textbf{Implementation Details:}
+\begin{itemize}
+    \item Message history list accumulating HumanMessage and AIMessage objects
+    \item Single LLM node processing entire message history
+    \item Context preservation across multiple turns
+    \item Groq LLaMA 3.3 70B with temperature=0.7 for natural conversation
+    \item State updates after each interaction to maintain coherence
+\end{itemize}
+
+\subsubsection{Assignment 2 Question 2: Two-Step Analyzer-Generator Pipeline}
+
+\textbf{Objective:} Create a sequential two-agent system for question simplification and answering
+
+\textbf{Agent 1 - Question Analyzer:}
+\begin{itemize}
+    \item Analyzes complex user questions
+    \item Rewrites in simpler, more understandable form
+    \item Explicitly instructed not to answer, only simplify
+    \item System message ensures consistent behavior
+\end{itemize}
+
+\textbf{Agent 2 - Answer Generator:}
+\begin{itemize}
+    \item Receives simplified question from Analyzer
+    \item Provides detailed, accurate answers
+    \item Specialized for general knowledge questions
+\end{itemize}
+
+\textbf{Graph Architecture:}
+\begin{itemize}
+    \item Linear two-node graph: Analyzer $\rightarrow$ Generator
+    \item State carries simplified question between agents
+    \item Single entry point (Analyzer), single finish point (Generator)
+    \item Demonstrates information refinement pipeline
+\end{itemize}
+
+\subsubsection{Assignment 2 Question 3: Router Agent with Domain Experts}
+
+\textbf{Objective:} Implement intelligent query routing to specialized expert agents
+
+\textbf{Router Agent:}
+\begin{itemize}
+    \item LLM-powered classification of user queries
+    \item Classification categories: Python programming vs. general knowledge
+    \item System prompt defining classification criteria and output format
+    \item Returns single-word decision: ``python'' or ``general''
+    \item Handles contextual nuances (e.g., Python as programming language vs. Python the snake)
+\end{itemize}
+
+\textbf{Expert Agents:}
+\begin{itemize}
+    \item \textbf{Python Expert}: Specialized in Python programming, libraries, syntax, debugging
+    \item \textbf{General Expert}: Handles history, science, mathematics, non-technical topics
+    \item Each expert has domain-specific system prompts
+\end{itemize}
+
+\textbf{Conditional Routing:}
+\begin{itemize}
+    \item \texttt{decide\_expert()} function invokes LLM for classification
+    \item Conditional edges route from Router to appropriate expert
+    \item Both experts terminate at END node
+    \item Demonstrates dynamic workflow adaptation based on input characteristics
+\end{itemize}
+
+\section{Transformer-Based NLP Tasks}
+
+\subsection{Overview}
+
+The transformer implementations leverage HuggingFace's pre-trained models for various NLP tasks, demonstrating the versatility of modern transformer architectures.
+
+\subsection{Text Summarization}
+
+\textbf{Model:} facebook/bart-large-cnn
+
+\textbf{Task:} Abstractive summarization of user-provided paragraphs
+
+\textbf{Configuration:}
+\begin{itemize}
+    \item Maximum summary length: 150 tokens
+    \item Minimum summary length: 60 tokens
+    \item Truncation enabled for long inputs
+\end{itemize}
+
+\textbf{Output:}
+\begin{itemize}
+    \item Summarized text
+    \item Length comparison between original and summary (word count)
+    \item Demonstrates compression ratio and information density
+\end{itemize}
+
+\subsection{Text Generation}
+
+\textbf{Model:} GPT-2
+
+\textbf{Task:} Continuation of user-provided starting phrases
+
+\textbf{Configuration:}
+\begin{itemize}
+    \item Maximum total length: 100 tokens
+    \item Maximum new tokens: 50
+    \item Number of sequences: 2 (generates multiple variations)
+    \item Truncation enabled
+\end{itemize}
+
+\textbf{Features:}
+\begin{itemize}
+    \item Creative text generation with coherent continuation
+    \item Multiple diverse outputs for same input
+    \item Demonstrates autoregressive generation capabilities
+\end{itemize}
+
+\subsection{Sentiment Analysis}
+
+\textbf{Model:} nlptown/bert-base-multilingual-uncased-sentiment
+
+\textbf{Task:} Multi-class sentiment classification of movie reviews
+
+\textbf{Functionality:}
+\begin{itemize}
+    \item Accepts 5 movie reviews from user
+    \item Classifies each review on 1-5 star rating scale
+    \item Outputs confidence scores for each prediction
+    \item BERT-based model provides multilingual support
+\end{itemize}
+
+\textbf{Output Format:}
+\begin{itemize}
+    \item Predicted star label (1-5 stars)
+    \item Confidence score (4 decimal places)
+    \item Review-by-review breakdown
+\end{itemize}
+
+\subsection{Overall Pipeline Integration}
+
+The transformer implementations can be combined into a comprehensive NLP pipeline:
+\begin{enumerate}
+    \item Input text preprocessing
+    \item Task-specific model selection
+    \item Inference with appropriate parameters
+    \item Post-processing and output formatting
+\end{enumerate}
+
+\section{Technical Architecture and Design Patterns}
+
+\subsection{State Management Strategies}
+
+Different frameworks employ distinct state management approaches:
+
+\textbf{Google ADK:}
+\begin{itemize}
+    \item Session-based state with key-value storage
+    \item Pydantic schemas for structured state
+    \item Automatic state persistence across interactions
+\end{itemize}
+
+\textbf{LangChain:}
+\begin{itemize}
+    \item Implicit state through message history
+    \item Chain-based composition with state passing
+    \item Retriever maintains external knowledge state (vector store)
+\end{itemize}
+
+\textbf{LangGraph:}
+\begin{itemize}
+    \item Explicit \texttt{TypedDict} state definitions
+    \item Reducer functions for state accumulation (e.g., \texttt{add\_messages})
+    \item Graph nodes receive and return state dictionaries
+    \item State immutability with functional updates
+\end{itemize}
+
+\subsection{Tool Integration Patterns}
+
+\textbf{Function Definition and Discovery:}
+\begin{itemize}
+    \item Docstrings serve as tool descriptions for LLMs
+    \item Type hints enable parameter validation
+    \item Return types specify expected output formats
+\end{itemize}
+
+\textbf{Tool Binding Methods:}
+\begin{itemize}
+    \item ADK: Direct tool list in agent constructor
+    \item LangChain: \texttt{bind\_tools()} method on LLM instances
+    \item LangGraph: ToolNode wrapping tool collections
+\end{itemize}
+
+\textbf{Tool Execution Flow:}
+\begin{itemize}
+    \item LLM generates tool calls with parameters
+    \item Tool execution node invokes actual functions
+    \item Results formatted as ToolMessage objects
+    \item Tool outputs fed back to LLM for response synthesis
+\end{itemize}
+
+\subsection{Retrieval-Augmented Generation Architecture}
+
+\textbf{Embedding Strategy:}
+\begin{itemize}
+    \item Dense vector representations of documents
+    \item Semantic similarity in embedding space
+    \item Model selection based on domain and computational constraints
+\end{itemize}
+
+\textbf{Chunking Strategies:}
+\begin{itemize}
+    \item Recursive character splitting preserves semantic coherence
+    \item Chunk overlap ensures context continuity
+    \item Optimal chunk size balances specificity and context
+\end{itemize}
+
+\textbf{Retrieval Mechanisms:}
+\begin{itemize}
+    \item Vector similarity search (cosine similarity)
+    \item Top-k retrieval for relevant context
+    \item Metadata filtering for refined results
+\end{itemize}
+
+\textbf{Generation with Retrieved Context:}
+\begin{itemize}
+    \item Context injection into prompt templates
+    \item Explicit citation instructions
+    \item Hallucination mitigation through grounding
+\end{itemize}
+
+\subsection{Conditional Routing and Control Flow}
+
+\textbf{Routing Functions:}
+\begin{itemize}
+    \item Examine current state to determine next action
+    \item Return string keys mapping to downstream nodes
+    \item Enable dynamic workflow adaptation
+\end{itemize}
+
+\textbf{Common Routing Patterns:}
+\begin{itemize}
+    \item Tool call detection (continue vs. end)
+    \item Classification-based routing (domain experts)
+    \item Validation-based branching (data quality checks)
+    \item User intent detection (interactive systems)
+\end{itemize}
+
+\textbf{Edge Types:}
+\begin{itemize}
+    \item Direct edges: Deterministic flow between nodes
+    \item Conditional edges: Dynamic routing based on state
+    \item Entry/finish points: Graph boundaries
+\end{itemize}
+
+\section{Key Insights and Best Practices}
+
+\subsection{Prompt Engineering for Agents}
+
+\begin{itemize}
+    \item \textbf{Specificity}: Detailed instructions reduce ambiguity and improve output quality
+    \item \textbf{Role Definition}: Clear agent roles enhance focused behavior
+    \item \textbf{Constraint Specification}: Explicit limits prevent unwanted outputs
+    \item \textbf{Output Format Instructions}: JSON schemas and examples ensure consistent formatting
+    \item \textbf{Tool Usage Guidelines}: Describe when and how to use available tools
+    \item \textbf{Citation Requirements}: Mandate source attribution for factual responses
+\end{itemize}
+
+\subsection{Tool Design Principles}
+
+\begin{itemize}
+    \item \textbf{Single Responsibility}: Each tool performs one well-defined task
+    \item \textbf{Clear Documentation}: Comprehensive docstrings aid LLM understanding
+    \item \textbf{Type Safety}: Proper type hints prevent runtime errors
+    \item \textbf{Error Handling}: Graceful failure modes with informative messages
+    \item \textbf{Idempotency}: Tools produce consistent results for identical inputs
+\end{itemize}
+
+\subsection{State Management Best Practices}
+
+\begin{itemize}
+    \item \textbf{Immutability}: Functional state updates prevent side effects
+    \item \textbf{Type Safety}: TypedDict and Pydantic schemas enforce structure
+    \item \textbf{Minimal State}: Store only essential information to reduce complexity
+    \item \textbf{State Initialization}: Proper default values prevent errors
+    \item \textbf{State Validation}: Check state integrity before processing
+\end{itemize}
+
+\subsection{RAG System Optimization}
+
+\begin{itemize}
+    \item \textbf{Chunk Size Tuning}: Balance between specificity and context completeness
+    \item \textbf{Embedding Model Selection}: Match model to domain and language requirements
+    \item \textbf{Retrieval Parameters}: Adjust k value based on query complexity
+    \item \textbf{Reranking}: Consider relevance reranking for improved precision
+    \item \textbf{Cache Management}: Persist vector stores to avoid reindexing
+    \item \textbf{Temperature Control}: Lower temperature for factual RAG responses
+\end{itemize}
+
+\subsection{Multi-Agent System Design}
+
+\begin{itemize}
+    \item \textbf{Specialization}: Dedicated agents for distinct domains or tasks
+    \item \textbf{Coordination}: Clear routing logic between agents
+    \item \textbf{Communication Protocols}: Standardized message formats
+    \item \textbf{Fallback Mechanisms}: Handle edge cases and classification errors
+    \item \textbf{Load Distribution}: Balance computational load across agents
+\end{itemize}
+
+\section{Challenges and Solutions}
+
+\subsection{Framework-Specific Constraints}
+
+\textbf{Challenge:} Google ADK restricts mixing custom and built-in tools
+
+\textbf{Solution:} Careful tool planning and potential agent decomposition
+
+\textbf{Challenge:} Silent tool execution without output display
+
+\textbf{Solution:} Explicit instructions to display tool results in agent responses
+
+\subsection{Context Window Limitations}
+
+\textbf{Challenge:} Long documents exceed LLM context windows
+
+\textbf{Solution:} Document chunking with semantic overlap, retrieval of only relevant chunks
+
+\textbf{Challenge:} Message history growth in conversational agents
+
+\textbf{Solution:} Sliding window approaches or message summarization
+
+\subsection{Hallucination Mitigation}
+
+\textbf{Challenge:} LLMs generating incorrect information
+
+\textbf{Solution:} RAG grounding, temperature reduction, explicit citation requirements
+
+\textbf{Challenge:} Tool call fabrication
+
+\textbf{Solution:} Tool validation, error handling, tool call verification
+
+\subsection{State Synchronization}
+
+\textbf{Challenge:} Global state management in complex workflows
+
+\textbf{Solution:} Functional state updates, immutable state patterns
+
+\textbf{Challenge:} State corruption across agent interactions
+
+\textbf{Solution:} State validation functions, type enforcement
+
+\section{Performance Considerations}
+
+\subsection{Computational Efficiency}
+
+\begin{itemize}
+    \item \textbf{Local vs. API Models}: Ollama enables local inference without API costs
+    \item \textbf{Model Size Selection}: Balance between capability and speed (e.g., 7B vs. 70B parameters)
+    \item \textbf{Batch Processing}: Process multiple queries simultaneously when possible
+    \item \textbf{Caching}: Vector store persistence eliminates recomputation
+\end{itemize}
+
+\subsection{Response Quality vs. Speed}
+
+\begin{itemize}
+    \item \textbf{Temperature Tuning}: Lower values for factual tasks, higher for creative tasks
+    \item \textbf{Token Limits}: Constrain generation length for faster responses
+    \item \textbf{Model Selection}: Lighter models for simple tasks, larger models for complex reasoning
+\end{itemize}
+
+\subsection{Scalability Patterns}
+
+\begin{itemize}
+    \item \textbf{Asynchronous Processing}: Background task execution for long-running operations
+    \item \textbf{Parallel Agent Execution}: Independent agents run concurrently
+    \item \textbf{Vector Store Sharding}: Distribute large document collections
+    \item \textbf{API Rate Limiting}: Implement backoff strategies for API calls
+\end{itemize}
+
+\section{Applications and Use Cases}
+
+\subsection{Educational and Research}
+
+\begin{itemize}
+    \item Interactive tutoring systems with domain-specific knowledge
+    \item Research paper Q\&A using RAG on academic corpora
+    \item Mathematical problem-solving with tool-using agents
+    \item Language learning assistants with conversational memory
+\end{itemize}
+
+\subsection{Business and Enterprise}
+
+\begin{itemize}
+    \item Customer support chatbots with product knowledge retrieval
+    \item Document drafting and editing assistants
+    \item Data analysis agents with calculation tools
+    \item Multi-domain expert systems with routing
+\end{itemize}
+
+\subsection{Content and Media}
+
+\begin{itemize}
+    \item Review analysis and sentiment tracking
+    \item Content summarization pipelines
+    \item Creative text generation systems
+    \item Media recommendation engines
+\end{itemize}
+
+\section{Future Directions}
+
+\subsection{Technical Enhancements}
+
+\begin{itemize}
+    \item \textbf{Multi-Modal Agents}: Integration of vision and audio capabilities
+    \item \textbf{Streaming Responses}: Real-time token streaming for better UX
+    \item \textbf{Advanced Routing}: Neural routing networks for complex workflows
+    \item \textbf{Memory Systems}: Long-term memory with episodic recall
+    \item \textbf{Self-Improvement}: Agents learning from interaction history
+\end{itemize}
+
+\subsection{Domain-Specific Applications}
+
+\begin{itemize}
+    \item Financial analysis agents with market data tools
+    \item Healthcare assistants with medical knowledge bases
+    \item Legal document processing and analysis
+    \item Scientific research assistants for literature review
+\end{itemize}
+
+\subsection{Evaluation and Monitoring}
+
+\begin{itemize}
+    \item Automated testing frameworks for agent behavior
+    \item Performance metrics and benchmarking
+    \item Human feedback integration loops
+    \item Error tracking and debugging tools
+\end{itemize}
+
+\section{Conclusion}
+
+This project demonstrates a comprehensive exploration of modern agentic AI systems across multiple frameworks and paradigms. Through implementations ranging from basic conversational agents to sophisticated multi-agent systems with RAG capabilities, the work showcases the rapid evolution and practical applicability of autonomous AI agents.
+
+Key achievements include:
+\begin{itemize}
+    \item Successful implementation of 15+ distinct agent architectures
+    \item Integration of multiple LLM providers (Google Gemini, LLaMA, GPT-2, BERT)
+    \item Production-ready RAG systems with persistent vector storage
+    \item Stateful multi-agent workflows with conditional routing
+    \item Transformer-based NLP pipelines for real-world text processing
+\end{itemize}
+
+The project establishes a strong foundation for continued exploration of agentic AI, providing both theoretical understanding and practical implementation experience. The modular architecture and comprehensive documentation enable extension and adaptation to diverse application domains.
+
+As agentic AI continues to evolve, the patterns and practices developed in this project provide a roadmap for building increasingly sophisticated, autonomous, and reliable AI systems capable of complex reasoning, planning, and action in real-world environments.
+
+\section*{Acknowledgments}
+
+Special thanks to the Winter in Data Science (WIDS) program at IIT Bombay for providing the framework and resources for this comprehensive exploration of agentic AI systems. Gratitude to the open-source community maintaining LangChain, LangGraph, and HuggingFace Transformers, whose tools enabled rapid development and experimentation.
+
+\end{document}

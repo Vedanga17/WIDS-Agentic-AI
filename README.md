@@ -28,27 +28,51 @@ The primary use case involves a restaurant review analysis system that can answe
 
 - **Local AI Agent**: Question-answering system powered by Ollama's LLaMA 3.2 model
 - **Google ADK Agents**: Implementation of agents using Google's Agent Development Kit (ADK) with Gemini models
+  - Basic conversational agents
+  - Tool-enabled agents with custom functions
+  - Structured output agents with JSON schemas
+  - Session-based state management agents
+  - Multi-agent hierarchical systems with delegation
 - **RAG Pipeline**: Retrieval-augmented generation using ChromaDB vector store
 - **PDF RAG Agent**: Advanced RAG agent that answers questions from PDF documents
 - **ReAct Agent**: Reasoning and Acting agent with tool integration
 - **Drafter Agent**: Automated document drafting assistant
 - **Sentiment Analysis**: Multi-class sentiment classification using pre-trained BERT models
+- **Text Generation**: GPT-2 based text continuation and creative writing
+- **Text Summarization**: BART-based abstractive summarization
 - **Graph-Based Agents**: Stateful agent workflows implemented with LangGraph
 - **Vector Search**: Efficient semantic search over restaurant reviews and PDF documents using embeddings
+- **Stock Price Integration**: Real-time financial data retrieval using yfinance
 
 ## Project Structure
 
 ```
 WIDS Project/
 ├── Scripts/
-│   ├── transformer.py             # Sentiment analysis experiments
+│   ├── transformer/               # Transformer-based NLP tasks
+│   │   └── Assignment_1/          # Transformer pipeline implementations
+│   │       ├── sentiment.py       # Sentiment analysis with BERT
+│   │       ├── text_gen.py        # Text generation with GPT-2
+│   │       ├── summarization.py   # Text summarization with BART
+│   │       └── overall_pipeline.py # Combined NLP pipeline
 │   ├── ADK_Google/                # Google Agent Development Kit (ADK) implementations
 │   │   ├── 1-Basic_Agent/
 │   │   │   └── greeting_agent/    # Basic greeting agent with Gemini 2.5 Flash
 │   │   ├── 2-Tool_Agent/
 │   │   │   └── tool_agent/        # Agent with custom tools (factorial, current time)
-│   │   └── 3-2nd_Agent/
-│   │       └── wheel_fortunate_agent/  # Interactive fortune wheel game agent
+│   │   ├── 3-2nd_Agent/
+│   │   │   └── wheel_fortunate_agent/  # Interactive fortune wheel game agent
+│   │   ├── 4-Structured_Agent/
+│   │   │   └── paragraph_agent/   # Agent with structured JSON output
+│   │   ├── 5-Sessions_Based_Agent/
+│   │   │   ├── question_answer_agent/  # Agent with session state management
+│   │   │   └── basic_session_state.py  # Session state demonstration
+│   │   └── 6-Multi_Agent_Based/
+│   │       └── manager_agent/     # Hierarchical multi-agent system
+│   │           ├── agent.py       # Manager agent coordinator
+│   │           └── sub_agents/    # Specialized sub-agents
+│   │               ├── basic_math/    # Mathematical operations agent
+│   │               └── DOB_giver/     # Date of birth lookup agent
 │   ├── Langchain/
 │   │   ├── local-ai-agent.py      # RAG-based Q&A system for restaurant reviews
 │   │   ├── vector.py              # Vector store initialization and retrieval
@@ -122,12 +146,7 @@ Before running this project, ensure you have the following installed:
    pip install langchain langchain-ollama langchain-chroma langchain-core
    pip install langchain-groq langchain-huggingface langchain-community
    pip install pandas transformers torch chromadb pypdf
-   pip install langgraph ipython python-dotenv
-   ```
-
-4. (Optional) Install Google ADK for ADK agent examples:
-   ```bash
-   pip install google-adk
+   pip install langgraph ipython python-dotenv google-adk yfinance
    ```
 
 ## Usage
@@ -193,6 +212,101 @@ An interactive game agent that:
 ```bash
 pip install google-adk
 ```
+
+#### 4. Structured Output Agent
+```bash
+cd Scripts/ADK_Google/4-Structured_Agent/paragraph_agent
+adk run
+```
+An agent demonstrating structured JSON output using Pydantic schemas:
+- Generates ~50 word paragraphs on user-specified topics
+- Enforces output format with Pydantic BaseModel
+- JSON-only responses with field validation
+- Word count constraints (45-65 words)
+- Demonstrates output_schema and output_key parameters
+
+#### 5. Session-Based Agent
+```bash
+cd Scripts/ADK_Google/5-Sessions_Based_Agent
+python basic_session_state.py
+```
+An agent showcasing session state management:
+- Pre-loaded state with mathematician information
+- Contextual question answering based on session state
+- State variables: mathematician name and famous formulae
+- Demonstrates agent-session separation architecture
+- Selective output based on user queries
+
+#### 6. Multi-Agent Manager System
+```bash
+cd Scripts/ADK_Google/6-Multi_Agent_Based/manager_agent
+adk web
+```
+A sophisticated hierarchical agent system with delegation and coordination:
+
+**Manager Agent:**
+- Intelligently routes requests to specialized sub-agents
+- Uses custom tools for direct operations
+- Synthesizes and formats responses from sub-agents
+- Handles multi-domain queries in single conversation
+
+**Sub-Agents:**
+- **basic_math**: Arithmetic operations (add, subtract, multiply, divide)
+- **DOB_giver**: Celebrity birth date lookup using Google Search
+
+**Custom Tools:**
+- **current_stock_price**: Real-time stock price retrieval using yfinance
+  - Fetches latest closing prices
+  - Supports any stock ticker symbol (e.g., AAPL, GOOGL, TSLA)
+  - Returns formatted price with 2 decimal precision
+
+**Features:**
+- Automatic function calling (AFC) with up to 10 remote calls
+- Hierarchical delegation patterns
+- Responsibility handoff between agents
+- Mixed tool types (custom functions + built-in Google Search)
+- Sub-agents manage their own tool ecosystems
+
+**Use Case:** Universal assistant handling math, biographical queries, and financial data in coordinated multi-agent workflow
+
+**Note:** Requires yfinance: `pip install yfinance`
+
+### Transformer-Based NLP Tasks
+
+The project includes comprehensive transformer pipeline implementations:
+
+#### Sentiment Analysis
+```bash
+cd Scripts/transformer/Assignment_1
+python sentiment.py
+```
+Multi-class sentiment analysis using BERT:
+- Model: `nlptown/bert-base-multilingual-uncased-sentiment`
+- 5-star rating classification for movie reviews
+- Confidence scores for each prediction
+- Batch processing of multiple reviews
+
+#### Text Generation
+```bash
+python text_gen.py
+```
+Creative text continuation using GPT-2:
+- Generates coherent text from user prompts
+- Multiple sequence generation (2 variations)
+- Configurable max length (100 tokens) and new tokens (50)
+- Demonstrates autoregressive text generation
+
+#### Text Summarization
+```bash
+python summarization.py
+```
+Abstractive summarization using BART:
+- Model: `facebook/bart-large-cnn`
+- Configurable summary length (60-150 tokens)
+- Compression ratio analysis
+- Word count comparison between original and summary
+
+**Note:** First-time runs will download model weights from HuggingFace (may take time depending on connection)
 
 ### Exploring LangGraph Tutorials
 
@@ -363,6 +477,173 @@ Interactive fortune wheel game demonstrating random selection and explicit tool 
 
 **Use Case:** Fun interactive game that provides users with positive random outcomes
 
+#### 4-Structured_Agent/paragraph_agent
+Agent demonstrating structured JSON output using Pydantic schemas for validated responses.
+
+**Features:**
+- Model: `gemini-2.5-flash-lite`
+- Pydantic BaseModel for output schema definition
+- Field-level descriptions for structured data
+- JSON-only response enforcement
+- Word count constraints (45-65 words per paragraph)
+- Uses LlmAgent class with output_schema parameter
+- Output key specification for state storage
+
+**Technical Details:**
+- Output schema defined using Pydantic Field with descriptions
+- Instructions explicitly mandate JSON format
+- No extraneous output beyond JSON structure
+- Demonstrates type-safe, validated agent responses
+
+**Use Case:** Generating structured content with guaranteed format compliance for downstream processing
+
+#### 5-Sessions_Based_Agent/question_answer_agent
+Agent showcasing session state management and contextual information retrieval.
+
+**Features:**
+- Model: `gemini-2.5-flash-lite`
+- Pre-loaded session state with contextual information
+- State variables: Mathematician name and famous formulae
+- Selective information retrieval based on queries
+- Demonstrates agent-session architecture separation
+- Answers questions using only provided state context
+
+**Architecture:**
+- Agent definition in `question_answer_agent/agent.py`
+- Session management in `basic_session_state.py`
+- State injection into agent context
+- Targeted response generation (only requested information)
+
+**Use Case:** Context-aware Q&A systems where responses depend on pre-loaded session-specific data
+
+#### 6-Multi_Agent_Based/manager_agent
+Sophisticated hierarchical multi-agent system demonstrating agent coordination, delegation, and tool orchestration.
+
+**System Architecture:**
+
+**Manager Agent (Root Agent):**
+- Model: `gemini-2.5-flash-lite`
+- Analyzes user queries and routes to appropriate handler
+- Delegates to specialized sub-agents or invokes direct tools
+- Synthesizes results from sub-agents/tools
+- Formats user-friendly responses
+- Handles multi-turn conversations across domains
+
+**Sub-Agents:**
+
+1. **basic_math** (Arithmetic Specialist):
+   - Four custom tools: Add, Subtract, Multiply, Divide
+   - Integer operations with result dictionaries
+   - Zero-division handling in Divide
+   - Returns structured {"result": value} responses
+   - Hands back control for non-math queries
+
+2. **DOB_giver** (Biographical Information Specialist):
+   - Integrated Google Search tool for web queries
+   - Finds birth dates of famous personalities
+   - Structured output: {"name": str, "dob": DD/MM/YYYY}
+   - Web search strategy for biographical data
+   - Returns control for non-biographical queries
+
+**Direct Tools:**
+
+- **current_stock_price(stock_name)**: 
+  - Integration with yfinance library
+  - Fetches real-time stock prices
+  - Retrieves 1-day historical data
+  - Extracts latest closing price
+  - Returns: {"Stock Price": "formatted price with 2 decimals"}
+  - Supports any valid ticker symbol (AAPL, GOOGL, TSLA, etc.)
+
+**Key Technical Features:**
+- Automatic Function Calling (AFC) enabled with max 10 remote calls
+- Tool chaining and nested agent delegation
+- Mixed tool types: custom functions + built-in Google Search
+- Sub-agents manage their own tool ecosystems independently
+- Hierarchical delegation with responsibility handoff
+- Explicit response instructions to prevent silent execution
+
+**Critical Implementation Details:**
+- Root agent variable naming convention (ADK requirement)
+- Proper import paths for sub-agent packages: `.sub_agents.agent_name.agent`
+- Tool import specificity: `from google.adk.tools.google_search import google_search`
+- Sub-agents in `sub_agents` list, not wrapped in AgentTool
+- Tool vs. agent distinction: simple functions vs. complex multi-tool agents
+
+**Use Case:** Universal intelligent assistant handling mathematical calculations, biographical queries, and real-time financial data through coordinated multi-agent delegation
+
+**Dependencies:** `pip install yfinance google-adk`
+
+### 2. Transformer-Based NLP (`transformer/Assignment_1/`)
+
+Comprehensive transformer pipeline implementations using HuggingFace pre-trained models:
+
+#### sentiment.py - Multi-Class Sentiment Analysis
+Advanced sentiment classification system using BERT-based models.
+
+**Features:**
+- Model: `nlptown/bert-base-multilingual-uncased-sentiment`
+- 5-class sentiment classification (1-5 star ratings)
+- Batch processing of multiple movie reviews
+- Confidence score output (4 decimal precision)
+- Multilingual support (trained on multiple languages)
+- HuggingFace pipeline API for easy integration
+
+**Technical Details:**
+- BERT-based architecture for contextual understanding
+- Pre-trained on multilingual sentiment data
+- Token classification with softmax confidence scores
+- Handles 5 reviews in single batch
+
+**Use Case:** Analyze customer reviews, social media sentiment, product feedback, or any text-based ratings
+
+#### text_gen.py - Creative Text Generation
+Autoregressive text generation using GPT-2 for coherent continuations.
+
+**Features:**
+- Model: `gpt2` (124M parameters)
+- Generates creative text from user-provided prompts
+- Multiple sequence generation (2 variations per input)
+- Configurable parameters:
+  - max_length: 100 tokens (total)
+  - max_new_tokens: 50 (newly generated)
+  - num_return_sequences: 2 (variations)
+  - truncation: True (handles long inputs)
+
+**Technical Details:**
+- Autoregressive generation (predicts next token iteratively)
+- Transformer decoder architecture
+- Temperature and top-k/top-p sampling for diversity
+- Multiple outputs for creative variation
+
+**Use Case:** Content creation, story writing, prompt completion, creative brainstorming, writing assistance
+
+#### summarization.py - Abstractive Text Summarization
+Intelligent text summarization using BART for information compression.
+
+**Features:**
+- Model: `facebook/bart-large-cnn` (406M parameters)
+- Abstractive summarization (generates new sentences, not extraction)
+- Configurable summary length:
+  - max_length: 150 tokens
+  - min_length: 60 tokens
+- Truncation handling for long documents
+- Word count comparison (original vs. summary)
+- Compression ratio analysis
+
+**Technical Details:**
+- BART: Bidirectional and Auto-Regressive Transformer
+- Encoder-decoder architecture
+- Pre-trained on CNN/DailyMail dataset
+- Generates fluent, coherent summaries
+
+**Use Case:** Document summarization, article condensation, meeting notes, research paper abstracts, content briefs
+
+**overall_pipeline.py - Integrated NLP Pipeline**
+Combined pipeline integrating all three transformer tasks for comprehensive text analysis.
+
+**Note:** First-time execution downloads pre-trained model weights from HuggingFace (several GB, time varies by connection speed)
+
 ### 2. Sentiment Analysis (`transformer.py`)
 
 Multi-class sentiment classification system for analyzing movie reviews and general text.
@@ -373,6 +654,8 @@ Multi-class sentiment classification system for analyzing movie reviews and gene
 - Token classification and analysis
 - PyTorch-based implementation
 - HuggingFace Transformers integration
+
+**Note:** This file is legacy. See `transformer/Assignment_1/sentiment.py` for the current implementation.
 
 **Use Case:** Analyze customer reviews, social media sentiment, or any text-based feedback
 
@@ -535,14 +818,17 @@ Get your Groq API key from [https://console.groq.com](https://console.groq.com)
 - **Groq**: High-performance LLM inference API
 - **ChromaDB**: Vector database for embeddings storage and retrieval
 - **HuggingFace**: Embedding models and transformers library
-- **Transformers**: Pre-trained NLP models for sentiment analysis
+- **Transformers**: Pre-trained NLP models (BERT, GPT-2, BART)
+- **yfinance**: Real-time financial market data retrieval
 - **Pandas**: Data manipulation and analysis
 - **PyTorch**: Deep learning framework
+- **Pydantic**: Data validation and settings management using Python type annotations
 
 **Google ADK Agents:**
 - LLM: `gemini-2.5-flash` and `gemini-2.5-flash-lite` (via Google ADK)
 - Custom tool integration with Python functions
 - Interactive agent workflows
+- Built-in tools: Google Search
 
 **Local Agents:**
 - LLM: `llama3.2` (via Ollama)
@@ -552,8 +838,10 @@ Get your Groq API key from [https://console.groq.com](https://console.groq.com)
 - LLM: `llama-3.3-70b-versatile` (via Groq API)
 - Embeddings: `sentence-transformers/all-MiniLM-L6-v2` (via HuggingFace)
 
-**Sentiment Analysis:**
-- ModelHugging Face library for pre-trained NLP models
+**Transformer Models:**
+- Sentiment Analysis: `nlptown/bert-base-multilingual-uncased-sentiment`
+- Text Generation: `gpt2` (124M parameters)
+- Summarization: `facebook/bart-large-cnn` (406M parameters)Hugging Face library for pre-trained NLP models
 - **Pandas**: Data manipulation and analysis
 - **PyTorch**: Deep learning framework
 
