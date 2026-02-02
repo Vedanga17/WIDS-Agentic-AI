@@ -24,7 +24,9 @@ This project demonstrates the implementation of intelligent AI agents spanning m
 - Structured output agents using Pydantic schemas for JSON validation
 - Session-based agents with state management and contextual information
 - Multi-agent hierarchical systems with intelligent delegation and coordination
+- Sequential agent systems with ordered execution pipelines for decision-making
 - Real-time financial data integration with yfinance for stock price retrieval
+- Web search integration using Google Search for biographical and factual queries
 
 **LangChain & LangGraph Implementations:**
 - Retrieval-Augmented Generation (RAG) for domain-specific question answering
@@ -56,6 +58,7 @@ The project progresses from foundational agent concepts to sophisticated multi-a
   - Structured output agents with JSON schemas
   - Session-based state management agents
   - Multi-agent hierarchical systems with delegation
+  - Sequential agent systems with ordered execution
 - **RAG Pipeline**: Retrieval-augmented generation using ChromaDB vector store
 - **PDF RAG Agent**: Advanced RAG agent that answers questions from PDF documents
 - **ReAct Agent**: Reasoning and Acting agent with tool integration
@@ -66,6 +69,9 @@ The project progresses from foundational agent concepts to sophisticated multi-a
 - **Graph-Based Agents**: Stateful agent workflows implemented with LangGraph
 - **Vector Search**: Efficient semantic search over restaurant reviews and PDF documents using embeddings
 - **Stock Price Integration**: Real-time financial data retrieval using yfinance
+- **Web Search Integration**: Google Search capability for biographical and factual queries
+- **Sequential Workflows**: Multi-step decision making with ordered agent execution
+- **Data Validation**: Pydantic-based schema validation for structured outputs
 
 ## Project Structure
 
@@ -90,12 +96,19 @@ WIDS Project/
 │   │   ├── 5-Sessions_Based_Agent/
 │   │   │   ├── question_answer_agent/  # Agent with session state management
 │   │   │   └── basic_session_state.py  # Session state demonstration
-│   │   └── 6-Multi_Agent_Based/
-│   │       └── manager_agent/     # Hierarchical multi-agent system
-│   │           ├── agent.py       # Manager agent coordinator
-│   │           └── sub_agents/    # Specialized sub-agents
-│   │               ├── basic_math/    # Mathematical operations agent
-│   │               └── DOB_giver/     # Date of birth lookup agent
+│   │   ├── 6-Multi_Agent_Based/
+│   │   │   └── manager_agent/     # Hierarchical multi-agent system
+│   │   │       ├── agent.py       # Manager agent coordinator
+│   │   │       └── sub_agents/    # Specialized sub-agents
+│   │   │           ├── basic_math/    # Mathematical operations agent
+│   │   │           └── DOB_giver/     # Date of birth lookup agent
+│   │   └── 7-sequential_agent/
+│   │       └── car_selector_agent/    # Sequential car recommendation agent
+│   │           ├── agent.py           # Root sequential agent
+│   │           └── sub_agents/        # Sequential sub-agents
+│   │               ├── company_checker/   # Brand preference checker
+│   │               ├── budget_checker/    # Budget validation agent
+│   │               └── suggester/         # Car recommendation agent
 │   ├── Langchain/
 │   │   ├── local-ai-agent.py      # RAG-based Q&A system for restaurant reviews
 │   │   ├── vector.py              # Vector store initialization and retrieval
@@ -168,8 +181,9 @@ Before running this project, ensure you have the following installed:
    ```bash
    pip install langchain langchain-ollama langchain-chroma langchain-core
    pip install langchain-groq langchain-huggingface langchain-community
-   pip install pandas transformers torch chromadb pypdf
+   pip install pandas transformers torch chromadb pypdf sentence-transformers
    pip install langgraph ipython python-dotenv google-adk yfinance
+   pip install pydantic requests beautifulsoup4 numpy
    ```
 
 ## Usage
@@ -293,6 +307,35 @@ A sophisticated hierarchical agent system with delegation and coordination:
 **Use Case:** Universal assistant handling math, biographical queries, and financial data in coordinated multi-agent workflow
 
 **Note:** Requires yfinance: `pip install yfinance`
+
+#### 7. Sequential Agent - Car Selector
+```bash
+cd Scripts/ADK_Google/7-sequential_agent/car_selector_agent
+adk run
+```
+A sophisticated sequential agent system demonstrating ordered agent execution for car recommendations:
+
+**Sequential Architecture:**
+- Executes sub-agents in strict sequential order
+- Each agent processes output from the previous agent
+- Pipeline workflow: Company → Budget → Suggestion
+
+**Sub-Agents (Sequential Execution):**
+1. **company_checker**: Validates and records user's preferred car brand
+2. **budget_checker**: Confirms user's budget range for car purchase
+3. **suggester**: Recommends specific car models based on company and budget
+
+**Features:**
+- Model: `gemini-2.5-flash-lite` (each sub-agent)
+- SequentialAgent orchestration with ordered sub-agent execution
+- State propagation through the pipeline
+- Domain-specific recommendations (car brands and models)
+- Budget-aware filtering
+- Personalized suggestions based on user preferences
+
+**Use Case:** Intelligent shopping assistant for car purchases, demonstrating sequential decision-making workflows where each step depends on previous results
+
+**Technical Pattern:** Unlike parallel or hierarchical agents, sequential agents ensure deterministic execution order, ideal for workflows with strict dependencies
 
 ### Transformer-Based NLP Tasks
 
@@ -597,6 +640,67 @@ Sophisticated hierarchical multi-agent system demonstrating agent coordination, 
 
 **Dependencies:** `pip install yfinance google-adk`
 
+#### 7-sequential_agent/car_selector_agent
+Sequential multi-agent system demonstrating ordered agent execution for intelligent car purchase recommendations.
+
+**System Architecture:**
+
+**Root Agent (SequentialAgent):**
+- Orchestrates sub-agents in strict sequential order
+- Ensures each agent processes output from previous agent
+- Pipeline execution pattern: Company → Budget → Suggestion
+- No parallel execution - strictly ordered workflow
+
+**Sub-Agents (Sequential Order):**
+
+1. **company_checker**:
+   - Model: `gemini-2.5-flash-lite`
+   - First agent in the pipeline
+   - Captures user's preferred car brand/manufacturer
+   - Validates company preference (e.g., Toyota, Honda, BMW, Tesla)
+   - Passes validated company to next agent
+
+2. **budget_checker**:
+   - Model: `gemini-2.5-flash-lite`
+   - Second agent in the pipeline
+   - Receives company preference from previous agent
+   - Collects and validates user's budget range
+   - Ensures budget is realistic for selected brand
+   - Passes both company and budget to final agent
+
+3. **suggester**:
+   - Model: `gemini-2.5-flash-lite`
+   - Final agent in the pipeline
+   - Receives company and budget from previous agents
+   - Recommends specific car models matching criteria
+   - Provides detailed suggestions with model names and features
+   - Considers price range and brand compatibility
+
+**Key Technical Features:**
+- SequentialAgent class for ordered execution
+- State propagation through agent chain
+- Each agent has specific responsibility in the workflow
+- Deterministic execution order (no conditional routing)
+- Sub-agents in `sub_agents` list (order matters)
+- Clear separation of concerns (company → budget → recommendation)
+
+**Critical Implementation Details:**
+- Import pattern: `from .sub_agents.agent_name.agent import agent_name`
+- Root agent variable must be named `root_agent`
+- Sequential execution - no parallel processing
+- Each agent builds upon previous agent's output
+- Description field explains overall purpose
+
+**Use Case:** Intelligent shopping assistant for car purchases, demonstrating sequential decision-making where budget validation depends on company selection, and recommendations depend on both
+
+**Comparison with Manager Agent:**
+- **Sequential**: Fixed order execution (A → B → C)
+- **Manager**: Dynamic delegation based on query type
+- **Sequential**: All agents execute in every run
+- **Manager**: Only relevant agents execute per query
+
+**Dependencies:** `pip install google-adk`
+
 ### 2. Transformer-Based NLP (`transformer/Assignment_1/`)
 
 Comprehensive transformer pipeline implementations using HuggingFace pre-trained models:
@@ -844,8 +948,15 @@ Get your Groq API key from [https://console.groq.com](https://console.groq.com)
 - **Transformers**: Pre-trained NLP models (BERT, GPT-2, BART)
 - **yfinance**: Real-time financial market data retrieval
 - **Pandas**: Data manipulation and analysis
+- **NumPy**: Numerical computing library
 - **PyTorch**: Deep learning framework
 - **Pydantic**: Data validation and settings management using Python type annotations
+- **Requests**: HTTP library for API calls and web requests
+- **BeautifulSoup4**: Web scraping and HTML/XML parsing
+- **Python-dotenv**: Environment variable management
+- **Sentence-Transformers**: Framework for state-of-the-art sentence embeddings
+
+**Model Specifications:**
 
 **Google ADK Agents:**
 - LLM: `gemini-2.5-flash` and `gemini-2.5-flash-lite` (via Google ADK)
@@ -864,22 +975,50 @@ Get your Groq API key from [https://console.groq.com](https://console.groq.com)
 **Transformer Models:**
 - Sentiment Analysis: `nlptown/bert-base-multilingual-uncased-sentiment`
 - Text Generation: `gpt2` (124M parameters)
-- Summarization: `facebook/bart-large-cnn` (406M parameters)Hugging Face library for pre-trained NLP models
-- **Pandas**: Data manipulation and analysis
-- **PyTorch**: Deep learning framework
+- Summarization: `facebook/bart-large-cnn` (406M parameters)
 
 ## Configuration
 
 ### Environment Variables
 
-No environment variables are currently required as the project uses local Ollama models.
+For LangGraph AI agents (RAG, ReAct, Drafter, and Assignment 2 agents), create a `.env` file in the project root:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+Get your Groq API key from [https://console.groq.com](https://console.groq.com)
+
+**Note:** Google ADK agents and Ollama-based agents do not require API keys.
 
 ### Model Configuration
 
-Models are configured in the respective Python files:
+**Ollama Models (Local):**
+Models are configured to run locally via Ollama:
 - LLM: `llama3.2` (via Ollama)
 - Embeddings: `mxbai-embed-large` (via Ollama)
-- Sentiment Analysis: `nlptown/bert-base-multilingual-uncased-sentiment`
+
+Make sure to pull these models before running:
+```bash
+ollama pull llama3.2
+ollama pull mxbai-embed-large
+```
+
+**Groq Models (Cloud API):**
+Used in LangGraph agents with API key authentication:
+- LLM: `llama-3.3-70b-versatile`
+
+**Google Gemini Models:**
+Used in Google ADK agents (managed by ADK):
+- `gemini-2.5-flash`
+- `gemini-2.5-flash-lite`
+
+**HuggingFace Models:**
+Downloaded automatically on first use:
+- Sentiment: `nlptown/bert-base-multilingual-uncased-sentiment`
+- Text Generation: `gpt2`
+- Summarization: `facebook/bart-large-cnn`
+- Embeddings: `sentence-transformers/all-MiniLM-L6-v2`
 
 ## Data
 
@@ -888,6 +1027,70 @@ The project includes a sample dataset of restaurant reviews (`realistic_restaura
 - Review: Full review text
 - Rating: Numerical rating
 - Date: Review date
+
+## Development
+
+### Code Quality Tools
+
+The project includes development dependencies for maintaining code quality:
+
+- **pytest**: Unit testing framework
+- **black**: Python code formatter
+- **flake8**: Linting and style guide enforcement
+
+To format code:
+```bash
+black Scripts/
+```
+
+To run linting:
+```bash
+flake8 Scripts/
+```
+
+To run tests (if test files are added):
+```bash
+pytest
+```
+
+### Project Structure Best Practices
+
+- **Modular Design**: Each agent type has its own directory
+- **Sub-agent Architecture**: Complex agents delegate to specialized sub-agents
+- **Tool Integration**: Custom Python functions exposed as agent tools
+- **State Management**: Session-based and stateful workflows
+- **Type Safety**: Pydantic schemas for structured outputs
+
+## Troubleshooting
+
+### Common Issues
+
+**1. Ollama Connection Error**
+- Ensure Ollama is running: `ollama serve`
+- Verify models are pulled: `ollama list`
+
+**2. ChromaDB Persistence**
+- Vector databases are stored in `chroma_langchain_db/` and `chroma_rag_db/`
+- Delete these folders to reset the database
+
+**3. Google ADK Agents Not Running**
+- Ensure you're in the correct directory
+- Run with `adk run` or `adk web`
+- Check that `agent.py` defines `root_agent`
+
+**4. HuggingFace Model Download**
+- First run downloads models (several GB)
+- Ensure stable internet connection
+- Models cached in `~/.cache/huggingface/`
+
+**5. Import Errors**
+- Activate virtual environment: `venv\Scripts\activate` (Windows)
+- Reinstall dependencies: `pip install -r requirements.txt`
+
+**6. GROQ API Errors**
+- Check `.env` file exists with valid `GROQ_API_KEY`
+- Verify API key at [https://console.groq.com](https://console.groq.com)
+- Check API rate limits
 
 ## License
 
