@@ -1,11 +1,19 @@
+"""
+This is the root agent file, "manager agent" which decides which subagent will handle the user given prompt based on the 
+work ability of the subagent. It controls the flow of information in the workflow. If the subagent gets confused, it just gives
+the responsibility back to the manager for further execution and control.
+"""
+
 from google.adk.agents import Agent
-import yfinance as yf
-from google.adk.tools.agent_tool import AgentTool
+import yfinance as yf # stock price tool
+from google.adk.tools.agent_tool import AgentTool 
+# Important: if a subagent uses a built-in ADK tool (for eg. google search), it cannot be directly passed as a subagent, it must 
+# be wrapped inside the the AgentTool method, and then passed to the manager agent as a tool which it can use (ADK nonsense).
 
-from .sub_agents.basic_math.agent import basic_math
-from .sub_agents.DOB_giver.agent import DOB_giver
+from .sub_agents.basic_math.agent import basic_math # importing the subagent from the folder it is present in
+from .sub_agents.DOB_giver.agent import DOB_giver # importing the subagent from the folder it is present in
 
-def current_stock_price(stock_name: str)-> dict:
+def current_stock_price(stock_name: str)-> dict: # custom tool for stock price display
     """This function is used to display the current stock price for a user-specified stock."""
 
     stock = yf.Ticker(stock_name)
@@ -47,4 +55,8 @@ root_agent = Agent(
     sub_agents=[basic_math],
     tools=[current_stock_price, AgentTool(DOB_giver)],
 )
+
+# subagents are passed in the sub_agents parameter.
+# Instructions must be very clear and precise, so that the manager agent properly understands the responsibility bestowed upon it;
+# it is given information about all the tools and subagents at its disposal.
 

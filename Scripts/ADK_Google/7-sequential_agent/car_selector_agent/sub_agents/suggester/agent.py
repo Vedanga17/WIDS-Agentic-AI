@@ -20,5 +20,5 @@ suggester = LlmAgent(
     A suitable car for you is BMW X5 SUV.
     etc.
     """,
-    output_key="suggestion",
+    output_key="suggestion", # storing the result of the agent to state, for the main agent to access.
 )

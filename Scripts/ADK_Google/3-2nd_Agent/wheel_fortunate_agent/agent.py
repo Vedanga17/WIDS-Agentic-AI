@@ -7,7 +7,7 @@ def fortunate_wheel(): # display 1 of the 3 good outcomes
         "You win $5000!",
         "You get to meet your favourite celebrity and hang out with them!"
     ]
-    return random.choice(outcomes)
+    return random.choice(outcomes) # returns a random choice among the ones provided.
 
 root_agent = Agent(
     name= "wheel_fortunate_agent",

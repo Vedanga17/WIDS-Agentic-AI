@@ -22,6 +22,7 @@ root_agent = LlmAgent(
     }
 
     DO NOT OUTPUT ANYTHING OTHER the specified JSON response.
+    
     """, # the instructions, other than being very specific, also explicitly mention the output schema, so that the agent doesn't mess up
     output_schema=output_format, # the class defined for the output schema being passed here
     output_key="para" # name of state key where state for this conversation will be stored.

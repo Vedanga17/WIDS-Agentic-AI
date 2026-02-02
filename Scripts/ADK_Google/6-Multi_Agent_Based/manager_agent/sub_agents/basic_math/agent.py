@@ -1,6 +1,6 @@
 from google.adk.agents import Agent
 
-def Add(a: int, b: int)-> dict:
+def Add(a: int, b: int)-> dict: # defining the 4 arithmetic tools (custom tools)
     """Add 2 integers and return their sum"""
     c = a+b
     return {
@@ -52,3 +52,8 @@ basic_math = Agent(
     """,
     tools=[Add, Subtract, Multiply, Divide]
 )
+
+# In the instruction section, it is clearly mentioned that if the prompt given is unrelated to maths, directly pass on the entire
+# responsibility over to the manager agent to decide further flow. Very clear instructions given to the subagent here.
+
+# Also, the return format is properly specified to ensure smooth result display.

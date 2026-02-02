@@ -15,5 +15,5 @@ company_checker=LlmAgent(
     OUTPUT ONLY the name of the COMPANY.
     Example: 'Mercedes', or 'Audi' etc.
     """,
-    output_key="company",
+    output_key="company", # storing the result of the agent to state, for the next subagent to access.
 )

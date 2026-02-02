@@ -1,5 +1,5 @@
 from google.adk.agents import Agent
-from google.adk.tools import google_search
+from google.adk.tools import google_search # built-in ADK tool
 
 DOB_giver = Agent(
     name="DOB_agent",
@@ -18,3 +18,8 @@ DOB_giver = Agent(
     """,
     tools=[google_search],
 )
+
+# In the instruction section, it is clearly mentioned that if the prompt given is unrelated to DOB, directly pass on the entire
+# responsibility over to the manager agent to decide further flow. Very clear instructions given to the subagent here.
+
+# This subagent can't be directly passed as a subagent, it must be wrapped inside the AgentTool method for the program to work.
