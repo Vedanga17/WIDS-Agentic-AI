@@ -4,9 +4,13 @@ Stores all settings and constants used across the project
 """
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Get the directory where this config file is located
+BASE_DIR = Path(__file__).parent.resolve()
 
 # ========== API KEYS (from .env file) ==========
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
@@ -29,18 +33,20 @@ REQUEST_TIMEOUT = 10
 
 # ========== CHUNKING SETTINGS ==========
 # Size of each text chunk (in characters)
-CHUNK_SIZE = 1000
+# Increased to 1500 to keep more context together
+CHUNK_SIZE = 1500
 
 # Overlap between chunks (helps maintain context)
-CHUNK_OVERLAP = 200
+# Increased to 300 for better context preservation
+CHUNK_OVERLAP = 300
 
 # ========== EMBEDDING SETTINGS ==========
 # Model to use for generating embeddings (HuggingFace)
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 # ========== VECTOR STORE SETTINGS ==========
-# Path to store the Chroma database
-VECTOR_DB_PATH = "./department_vector_db"
+# Path to store the Chroma database (using absolute path)
+VECTOR_DB_PATH = str(BASE_DIR / "department_vector_db")
 
 # Collection name in Chroma
 COLLECTION_NAME = "che_department"

@@ -1,0 +1,64 @@
+# Environment Variables
+.env
+.env.local
+
+# Vector Database
+department_vector_db/
+*.sqlite3
+
+# Downloaded PDFs
+downloaded_pdfs/
+*.pdf
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Logs
+*.log
+
+# Streamlit
+.streamlit/
+
+# Test and Debug Files
+_final_test.py
+test_retrieval.py
+diagnose_issue.py
+quick_check.py
+rebuild_database.py
+rebuild_now.py
+simple_rebuild.py
+test_faculty_count.py
+check_new_db.py
+debug_retrieval.py
+check_homepage.py
+
+# Documentation (hiding local README)
+README.md
+
+# Old Database Backups
+department_vector_db_old/
+department_vector_db_old_backup/
+department_vector_db_new/

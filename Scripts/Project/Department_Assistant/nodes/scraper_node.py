@@ -16,7 +16,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from config import BASE_URL, ALLOWED_DOMAIN, SCRAPER_DELAY, MAX_PAGES, REQUEST_TIMEOUT
 from state import PipelineState
 
-# Create directory for downloaded PDFs
+# Create directory for downloaded PDFs (using absolute path)
 PDF_DOWNLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "downloaded_pdfs")
 os.makedirs(PDF_DOWNLOAD_DIR, exist_ok=True)
 
@@ -101,6 +101,9 @@ def scrape_website(start_url: str) -> Tuple[List[Dict[str, str]], List[Dict[str,
                     "type": "web"
                 })
                 
+                # Progress indicator
+                print(f"✓ Scraped {len(visited) + 1}/{MAX_PAGES}: {current_url}")
+                
                 # Find new links on this page
                 new_links = page_content["links"]
                 
@@ -156,7 +159,7 @@ def scrape_single_page(url: str) -> Dict:
 def extract_text(soup: BeautifulSoup) -> str:
     """
     Extract clean text from HTML soup
-    Removes scripts, styles, navigation, footer, etc.
+    Removes scripts, styles, but keeps important content areas
     
     Args:
         soup: BeautifulSoup object
@@ -164,8 +167,9 @@ def extract_text(soup: BeautifulSoup) -> str:
     Returns:
         Cleaned text content
     """
-    # Remove unwanted elements
-    for element in soup(['script', 'style', 'nav', 'footer', 'header']):
+    # Remove only truly unwanted elements (scripts, styles, etc.)
+    # Keep nav, header as they might contain important info on homepage
+    for element in soup(['script', 'style', 'noscript']):
         element.decompose()  # Remove from tree
     
     # Try to get main content area (common patterns)
@@ -175,15 +179,20 @@ def extract_text(soup: BeautifulSoup) -> str:
         soup.find('article') or        # Article tag
         soup.find('div', class_='content') or  # Common class name
         soup.find('div', id='content') or
-        soup.body                      # Fallback to body
+        soup.find('div', role='main') or  # ARIA role
+        soup.body                      # Fallback to body (includes more content)
     )
     
     if main_content:
         # Get text and clean it up
         text = main_content.get_text(separator=' ', strip=True)
         
-        # Clean up whitespace
-        text = ' '.join(text.split())  # Remove extra spaces/newlines
+        # Clean up whitespace but preserve meaningful line breaks
+        lines = [line.strip() for line in text.split('\n') if line.strip()]
+        text = ' '.join(lines)
+        
+        # Final cleanup of multiple spaces
+        text = ' '.join(text.split())
         
         return text
     

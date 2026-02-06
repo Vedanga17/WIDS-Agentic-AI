@@ -54,7 +54,7 @@ def retriever_node(state: PipelineState) -> PipelineState:
     return state
 
 
-def retrieve_documents(query: str, k: int = 4):
+def retrieve_documents(query: str, k: int = 10):
     """
     Retrieve relevant documents from vector database
     
@@ -62,12 +62,12 @@ def retrieve_documents(query: str, k: int = 4):
     1. Initialize embeddings (same model used for storage)
     2. Connect to Chroma database
     3. Convert query to embedding
-    4. Find top-k similar documents using cosine similarity
+    4. Find top-k similar documents using MMR for diversity
     5. Return documents with metadata
     
     Args:
         query: User's question
-        k: Number of documents to retrieve
+        k: Number of documents to retrieve (default: 10 for better coverage)
         
     Returns:
         List of dicts with 'content' and 'metadata'
@@ -86,9 +86,15 @@ def retrieve_documents(query: str, k: int = 4):
         persist_directory=VECTOR_DB_PATH
     )
     
-    # Create retriever with top-k similarity search
+    # Create retriever with MMR (Maximal Marginal Relevance) search
+    # MMR provides better diversity in results, reducing redundancy
     retriever = vectorstore.as_retriever(
-        search_kwargs={"k": k}  # Retrieve top 4 most similar chunks
+        search_type="mmr",  # Use MMR instead of pure similarity
+        search_kwargs={
+            "k": k,  # Retrieve top 10 most relevant chunks
+            "fetch_k": 30,  # Fetch 30 candidates before MMR filtering
+            "lambda_mult": 0.7  # Balance between relevance (1.0) and diversity (0.0)
+        }
     )
     
     # Retrieve documents
