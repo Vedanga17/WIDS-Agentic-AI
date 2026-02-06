@@ -18,9 +18,13 @@ chromadb>=0.4.22
 
 # PDF Processing
 pypdf>=3.17.0
+pypdf2>=3.0.0
 
 # Data Processing
 pandas>=2.0.0
+
+# Web Interface
+streamlit>=1.28.0
 
 # Machine Learning and NLP
 transformers>=4.35.0

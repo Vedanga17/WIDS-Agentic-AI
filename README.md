@@ -59,6 +59,7 @@ The project progresses from foundational agent concepts to sophisticated multi-a
   - Session-based state management agents
   - Multi-agent hierarchical systems with delegation
   - Sequential agent systems with ordered execution
+  - Parallel agent systems with concurrent execution and aggregation
 - **RAG Pipeline**: Retrieval-augmented generation using ChromaDB vector store
 - **PDF RAG Agent**: Advanced RAG agent that answers questions from PDF documents
 - **ReAct Agent**: Reasoning and Acting agent with tool integration
@@ -71,7 +72,9 @@ The project progresses from foundational agent concepts to sophisticated multi-a
 - **Stock Price Integration**: Real-time financial data retrieval using yfinance
 - **Web Search Integration**: Google Search capability for biographical and factual queries
 - **Sequential Workflows**: Multi-step decision making with ordered agent execution
+- **Parallel Agent Workflows**: Concurrent execution of multiple agents with result aggregation
 - **Data Validation**: Pydantic-based schema validation for structured outputs
+- **Production RAG System**: Complete department knowledge assistant with web scraping, PDF processing, and Streamlit interface
 
 ## Project Structure
 
@@ -102,13 +105,21 @@ WIDS Project/
 │   │   │       └── sub_agents/    # Specialized sub-agents
 │   │   │           ├── basic_math/    # Mathematical operations agent
 │   │   │           └── DOB_giver/     # Date of birth lookup agent
-│   │   └── 7-sequential_agent/
-│   │       └── car_selector_agent/    # Sequential car recommendation agent
-│   │           ├── agent.py           # Root sequential agent
-│   │           └── sub_agents/        # Sequential sub-agents
-│   │               ├── company_checker/   # Brand preference checker
-│   │               ├── budget_checker/    # Budget validation agent
-│   │               └── suggester/         # Car recommendation agent
+│   │   ├── 7-sequential_agent/
+│   │   │   └── car_selector_agent/    # Sequential car recommendation agent
+│   │   │       ├── agent.py           # Root sequential agent
+│   │   │       └── sub_agents/        # Sequential sub-agents
+│   │   │           ├── company_checker/   # Brand preference checker
+│   │   │           ├── budget_checker/    # Budget validation agent
+│   │   │           └── suggester/         # Car recommendation agent
+│   │   └── 8-Parallel_Agent/
+│   │       └── overall_report_agent/  # Parallel footballer stats aggregator
+│   │           ├── agent.py           # Root parallel + sequential agent
+│   │           └── sub_agents/        # Parallel sub-agents
+│   │               ├── goals_agent/       # Goals statistics agent
+│   │               ├── season_agent/      # Best season finder agent
+│   │               ├── titles_agent/      # Career titles counter agent
+│   │               └── summarizer_agent/  # Report aggregator agent
 │   ├── Langchain/
 │   │   ├── local-ai-agent.py      # RAG-based Q&A system for restaurant reviews
 │   │   ├── vector.py              # Vector store initialization and retrieval
@@ -130,6 +141,20 @@ WIDS Project/
 │   │           ├── Assn2_Q1.py    # Conversational agent with message history
 │   │           ├── Assn2_Q2.py    # Two-step analyzer-generator agent
 │   │           └── Assn2_Q3.py    # Router agent with domain experts
+│   ├── Project/
+│   │   └── Department_Assistant/  # Production RAG system for IIT Bombay
+│   │       ├── app.py             # Streamlit chat interface
+│   │       ├── main.py            # LangGraph orchestration
+│   │       ├── config.py          # Configuration and constants
+│   │       ├── state.py           # State definitions for workflows
+│   │       ├── README.md          # Detailed project documentation
+│   │       ├── nodes/             # LangGraph workflow nodes
+│   │       │   ├── scraper_node.py      # Web scraping & PDF download
+│   │       │   ├── processor_node.py    # Chunking & embedding
+│   │       │   ├── retriever_node.py    # Vector search
+│   │       │   └── responder_node.py    # LLM response generation
+│   │       ├── department_vector_db/    # ChromaDB storage
+│   │       └── downloaded_pdfs/         # Cached curriculum PDFs
 │   └── chroma_langchain_db/       # ChromaDB vector database storage
 ├── venv/                          # Python virtual environment
 ├── requirements.txt               # Project dependencies
@@ -337,6 +362,80 @@ A sophisticated sequential agent system demonstrating ordered agent execution fo
 
 **Technical Pattern:** Unlike parallel or hierarchical agents, sequential agents ensure deterministic execution order, ideal for workflows with strict dependencies
 
+#### 8-Parallel_Agent/overall_report_agent
+Parallel multi-agent system demonstrating concurrent agent execution with result aggregation for comprehensive footballer career analysis.
+
+```bash
+cd Scripts/ADK_Google/8-Parallel_Agent/overall_report_agent
+adk run
+```
+
+**System Architecture:**
+
+**Root Agent (SequentialAgent containing ParallelAgent):**
+- Orchestrates parallel data gathering followed by sequential summarization
+- Pipeline: [Parallel Stats Collection] → Summarizer
+- Combines parallel execution efficiency with sequential aggregation
+
+**Parallel Agent (FootballerStatsAgent):**
+- Executes multiple sub-agents concurrently for efficient data gathering
+- All three agents run simultaneously and return results
+- Results are collected and passed to summarizer agent
+
+**Sub-Agents (Concurrent Execution):**
+
+1. **goals_agent**:
+   - Model: `gemini-2.5-flash-lite`
+   - Analyzes career goals statistics
+   - Identifies total goals scored
+   - Finds favourite opponent to score against
+   - Runs in parallel with other stat agents
+
+2. **season_agent**:
+   - Model: `gemini-2.5-flash-lite`
+   - Identifies best season by goals scored
+   - Analyzes seasonal performance data
+   - Year and goal count determination
+   - Concurrent execution with goals and titles agents
+
+3. **titles_agent**:
+   - Model: `gemini-2.5-flash-lite`
+   - Counts total career titles won
+   - Includes league titles, cups, international trophies
+   - Parallel processing for efficiency
+
+4. **summarizer_agent** (Sequential):
+   - Model: `gemini-2.5-flash-lite`
+   - Receives aggregated data from three parallel agents
+   - Generates comprehensive career report
+   - Synthesizes goals, seasons, and titles information
+   - Final output formatting
+
+**Key Technical Features:**
+- ParallelAgent class for concurrent sub-agent execution
+- SequentialAgent wrapper for post-processing
+- Independent agent execution (no dependencies between parallel agents)
+- Result aggregation and synthesis
+- Efficient data collection through parallelization
+- Hybrid architecture: parallel data gathering + sequential summarization
+
+**Critical Implementation Details:**
+- Import pattern: `from google.adk.agents import ParallelAgent, SequentialAgent`
+- Sub-agents in `sub_agents` list for parallel execution
+- Parallel agent wrapped in sequential agent for summarization
+- Root agent must be named `root_agent`
+- Model name NOT specified at root level (sub-agents specify their models)
+
+**Use Case:** Sports statistics aggregator demonstrating parallel execution for independent data collection tasks, ideal when multiple information sources can be queried simultaneously without dependencies
+
+**Comparison with Sequential Agent:**
+- **Parallel**: All agents execute simultaneously (A || B || C)
+- **Sequential**: Fixed order execution (A → B → C)
+- **Parallel**: Faster for independent tasks
+- **Sequential**: Required when tasks depend on previous results
+
+**Dependencies:** `pip install google-adk`
+
 ### Transformer-Based NLP Tasks
 
 The project includes comprehensive transformer pipeline implementations:
@@ -457,6 +556,68 @@ python Assn2_Q3.py
 Ask Python programming or general knowledge questions - the router intelligently directs your query to the appropriate expert agent.
 
 **Note:** All Assignment 2 agents require a Groq API key in your `.env` file.
+
+### Running the Parallel Agent Workflow
+
+The parallel agent workflow demonstrates concurrent execution of multiple sub-agents for football player statistics:
+
+```bash
+cd Scripts/ADK_Google/8-Parallel_Agent/overall_report_agent
+adk run
+```
+
+Example interaction:
+```
+Enter footballer name: Cristiano Ronaldo
+```
+
+The agent will:
+1. Simultaneously gather goals statistics, best season data, and career titles
+2. Aggregate all information
+3. Generate a comprehensive career report
+
+### Running the Department Assistant
+
+The Department Assistant is a production-ready RAG system with a Streamlit interface:
+
+#### First Time Setup (One-time)
+```bash
+cd Scripts/Project/Department_Assistant
+streamlit run app.py
+```
+
+On first launch:
+1. Click "Initialize Database" in the sidebar
+2. Wait 25-40 minutes for the system to:
+   - Scrape 286 web pages from the Chemical Engineering department website
+   - Download 12 course curriculum PDFs (157 pages)
+   - Process content into 1,071 text chunks
+   - Generate and store embeddings in ChromaDB
+
+#### Regular Usage
+After initialization, simply run:
+```bash
+cd Scripts/Project/Department_Assistant
+streamlit run app.py
+```
+
+Ask questions like:
+- "Who are the faculty members in the department?"
+- "What research areas does the department focus on?"
+- "Tell me about the M.Tech program"
+- "What courses are offered in the curriculum?"
+- "What are the recent announcements?"
+
+**Technical Details:**
+- Orchestrated by LangGraph with two separate StateGraphs
+- Uses Groq's `llama-3.3-70b-versatile` model for responses
+- HuggingFace `all-MiniLM-L6-v2` embeddings for retrieval
+- BFS-based web scraper with polite crawling
+- Persistent ChromaDB vector store
+
+**Requirements:**
+- Groq API key in `.env` file
+- Install streamlit: `pip install streamlit`
 
 python lang_graph5.py
 ```
@@ -701,7 +862,228 @@ Sequential multi-agent system demonstrating ordered agent execution for intellig
 
 **Dependencies:** `pip install google-adk`
 
-### 2. Transformer-Based NLP (`transformer/Assignment_1/`)
+**Dependencies:** `pip install google-adk`
+
+### 2. Department Assistant Project (`Project/Department_Assistant/`)
+
+A production-ready RAG (Retrieval-Augmented Generation) pipeline built with **LangGraph** for intelligent Q&A about IIT Bombay's Chemical Engineering Department.
+
+#### System Overview
+
+Complete end-to-end RAG system that:
+1. Scrapes the Chemical Engineering department website (https://www.che.iitb.ac.in/)
+2. Downloads and processes course curriculum PDFs
+3. Generates embeddings and stores in ChromaDB vector database
+4. Provides intelligent answers through Streamlit chat interface
+5. Orchestrates entire workflow using LangGraph StateGraphs
+
+**Data Processed:**
+- **286 web pages** from department website
+- **12 PDF files** (157 total pages) with course curricula
+- **1,071 text chunks** in vector database
+
+#### Architecture
+
+Two separate **LangGraph StateGraphs**:
+
+**1. Data Collection Graph (Run Once):**
+```
+START → Scraper Node → Processor Node → END
+```
+
+**2. Query Graph (Run for Each Query):**
+```
+START → Retriever Node → Responder Node → END
+```
+
+#### Key Components
+
+**app.py - Streamlit Frontend:**
+- Interactive chat interface
+- Database initialization button
+- Chat history management
+- Progress indicators and status displays
+- Error handling and user feedback
+
+**main.py - LangGraph Orchestration:**
+- Defines two StateGraph workflows
+- `collect_data()`: Runs scraping and processing pipeline
+- `run_query()`: Executes retrieval and response generation
+- State management for workflow coordination
+
+**config.py - Configuration:**
+- Scraping parameters (delays, max pages, allowed domains)
+- Chunking settings (size: 1000, overlap: 200)
+- Model configurations (Groq LLM, HuggingFace embeddings)
+- Retrieval parameters (top-k: 5)
+- File paths and constants
+
+**state.py - State Definitions:**
+- `DataCollectionState`: Tracks scraped URLs, PDFs, text chunks
+- `QueryState`: Manages user queries, retrieved docs, responses
+- TypedDict definitions for type safety
+
+#### Workflow Nodes
+
+**nodes/scraper_node.py - Data Collection:**
+- BFS (Breadth-First Search) web crawling algorithm
+- Domain filtering to stay within allowed domain
+- Duplicate URL detection
+- PDF link identification and download
+- BeautifulSoup for HTML parsing
+- Polite crawling with configurable delays
+- Robust error handling for failed requests
+
+**nodes/processor_node.py - Text Processing:**
+- Text extraction from HTML using BeautifulSoup
+- PDF parsing with PyPDF2
+- Recursive character text splitting (chunk_size=1000, overlap=200)
+- HuggingFace embeddings generation (`all-MiniLM-L6-v2`)
+- ChromaDB vector store creation and persistence
+- Batch processing for efficiency
+
+**nodes/retriever_node.py - Semantic Search:**
+- Loads persistent ChromaDB vector database
+- Similarity search using cosine distance
+- Top-k retrieval (k=5) for relevant documents
+- Returns document content and metadata
+- Efficient vector similarity computation
+
+**nodes/responder_node.py - Answer Generation:**
+- Groq LLM integration (`llama-3.3-70b-versatile`)
+- Context-aware prompting with retrieved documents
+- RAG prompt template for grounded responses
+- Prevents hallucination by grounding in source documents
+- Formatted, conversational responses
+- Temperature-controlled generation
+
+#### Features
+
+**Intelligent Web Scraping:**
+- BFS traversal for systematic coverage
+- Robots.txt compliance (polite crawling)
+- Configurable crawl depth and delays
+- Domain boundary enforcement
+- PDF detection and batch downloading
+
+**Advanced Text Processing:**
+- Multi-source ingestion (HTML + PDF)
+- Smart chunking with overlap for context preservation
+- Metadata tracking (source URL, page numbers)
+- Efficient embedding generation
+- Persistent vector storage
+
+**Powerful Retrieval:**
+- Semantic similarity search (not keyword-based)
+- Ranked results by relevance
+- Fast vector database queries
+- Contextual document snippets
+
+**User-Friendly Interface:**
+- Clean Streamlit chat UI
+- Conversation history
+- Real-time response streaming
+- Database status indicators
+- One-click initialization
+
+#### Technical Specifications
+
+**Models:**
+- LLM: `llama-3.3-70b-versatile` (Groq)
+- Embeddings: `sentence-transformers/all-MiniLM-L6-v2` (HuggingFace)
+
+**Libraries:**
+- LangGraph: Workflow orchestration
+- LangChain: RAG pipeline components
+- ChromaDB: Vector database
+- Streamlit: Web interface
+- BeautifulSoup4: Web scraping
+- PyPDF2: PDF processing
+- Requests: HTTP client
+
+**Configuration:**
+- Chunk size: 1000 characters
+- Chunk overlap: 200 characters
+- Top-k retrieval: 5 documents
+- Max pages: 500 (currently scrapes 286)
+- Crawl delay: 0.5 seconds
+- Request timeout: 10 seconds
+
+**Performance:**
+- Initial data collection: 25-40 minutes
+- Query response time: 2-5 seconds
+- Database size: ~50 MB
+- Total documents: 1,071 chunks
+
+#### Use Cases
+
+**Student Queries:**
+- Course information and prerequisites
+- Faculty research areas
+- Program requirements (B.Tech, M.Tech, PhD)
+- Admission procedures
+
+**Research Inquiries:**
+- Department research focus areas
+- Faculty expertise and publications
+- Lab facilities and equipment
+- Collaboration opportunities
+
+**Administrative Questions:**
+- Department announcements
+- Event information
+- Contact details
+- Academic calendar
+
+**Prospective Students:**
+- Program offerings
+- Department reputation and rankings
+- Research opportunities
+- Career outcomes
+
+#### Setup Requirements
+
+1. **Environment Variables** (`.env`):
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+2. **Dependencies**:
+```bash
+pip install streamlit langchain langgraph langchain-groq langchain-huggingface
+pip install chromadb beautifulsoup4 pypdf2 requests sentence-transformers
+```
+
+3. **Running the Application**:
+```bash
+cd Scripts/Project/Department_Assistant
+streamlit run app.py
+```
+
+**First Launch:** Click "Initialize Database" in sidebar (one-time, takes 25-40 minutes)
+
+**Subsequent Launches:** Database persists, instant startup
+
+#### Limitations
+
+- Limited to publicly accessible web pages
+- PDF parsing may miss complex formatting
+- Requires stable internet for initial scraping
+- Response accuracy depends on source content quality
+- No real-time updates (database must be rebuilt manually)
+
+#### Future Enhancements
+
+- Incremental updates instead of full rebuild
+- Citation tracking (which document provided the answer)
+- Multi-language support
+- Advanced filtering (by content type, date, faculty)
+- Query analytics and logging
+- User feedback mechanism for answer quality
+
+**Dependencies:** `pip install streamlit langchain-groq beautifulsoup4 pypdf2`
+
+### 3. Transformer-Based NLP (`transformer/Assignment_1/`)
 
 Comprehensive transformer pipeline implementations using HuggingFace pre-trained models:
 
@@ -771,7 +1153,7 @@ Combined pipeline integrating all three transformer tasks for comprehensive text
 
 **Note:** First-time execution downloads pre-trained model weights from HuggingFace (several GB, time varies by connection speed)
 
-### 2. Sentiment Analysis (`transformer.py`)
+### 4. Sentiment Analysis (`transformer.py`)
 
 Multi-class sentiment classification system for analyzing movie reviews and general text.
 
@@ -786,7 +1168,7 @@ Multi-class sentiment classification system for analyzing movie reviews and gene
 
 **Use Case:** Analyze customer reviews, social media sentiment, or any text-based feedback
 
-### 3. LangGraph Tutorials (`Langgraph/Agents/`)
+### 5. LangGraph Tutorials (`Langgraph/Agents/`)
 
 Progressive tutorials showcasing LangGraph capabilities:
 
@@ -816,7 +1198,7 @@ Progressive tutorials showcasing LangGraph capabilities:
 - Complex state management with multiple attributes
 - Iterative workflows with loop conditions
 
-### 4. Advanced AI Agents (`Langgraph/AI Agents/`)
+### 6. Advanced AI Agents (`Langgraph/AI Agents/`)
 
 Production-ready AI agent implementations:
 
@@ -946,13 +1328,15 @@ Get your Groq API key from [https://console.groq.com](https://console.groq.com)
 - **ChromaDB**: Vector database for embeddings storage and retrieval
 - **HuggingFace**: Embedding models and transformers library
 - **Transformers**: Pre-trained NLP models (BERT, GPT-2, BART)
+- **Streamlit**: Python framework for building interactive web applications
+- **BeautifulSoup4**: Web scraping and HTML/XML parsing
+- **PyPDF2**: PDF document processing and text extraction
 - **yfinance**: Real-time financial market data retrieval
 - **Pandas**: Data manipulation and analysis
 - **NumPy**: Numerical computing library
 - **PyTorch**: Deep learning framework
 - **Pydantic**: Data validation and settings management using Python type annotations
 - **Requests**: HTTP library for API calls and web requests
-- **BeautifulSoup4**: Web scraping and HTML/XML parsing
 - **Python-dotenv**: Environment variable management
 - **Sentence-Transformers**: Framework for state-of-the-art sentence embeddings
 
