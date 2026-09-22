@@ -147,19 +147,22 @@ WIDS Project/
 │   │       ├── main.py            # LangGraph orchestration
 │   │       ├── config.py          # Configuration and constants
 │   │       ├── state.py           # State definitions for workflows
+│   │       ├── rebuild.py         # Backs up old data, then re-scrapes + rebuilds
+│   │       ├── requirements.txt   # Pinned dependencies for this project specifically
 │   │       ├── README.md          # Detailed project documentation
 │   │       ├── nodes/             # LangGraph workflow nodes
 │   │       │   ├── scraper_node.py      # Web scraping & PDF download
 │   │       │   ├── processor_node.py    # Chunking & embedding
 │   │       │   ├── retriever_node.py    # Vector search
 │   │       │   └── responder_node.py    # LLM response generation
-│   │       ├── department_vector_db/    # ChromaDB storage
 │   │       └── downloaded_pdfs/         # Cached curriculum PDFs
 │   └── chroma_langchain_db/       # ChromaDB vector database storage
 ├── venv/                          # Python virtual environment
-├── requirements.txt               # Project dependencies
+├── requirements.txt               # Project dependencies (whole repo)
 └── README.md                      # Project documentation
 ```
+
+**Note:** `Department_Assistant`'s vector database (`department_vector_db/`) no longer lives inside this folder - it's now built at a plain local path outside OneDrive (see that project's own README for why). Its own `requirements.txt` is separate from the root one above and pinned to exact versions.
 
 ## Prerequisites
 
@@ -476,7 +479,10 @@ Abstractive summarization using BART:
 ### Exploring LangGraph Tutorials
 
 The project includes progressive LangGraph tutorials demonstrating various concepts:
-/Agents
+
+**1. Basic Structure (lang_graph1.py)**
+```bash
+cd Scripts/Langgraph/Agents
 python lang_graph1.py
 ```
 Learn the simplest LangGraph structure with a single node.
@@ -578,24 +584,21 @@ The agent will:
 
 ### Running the Department Assistant
 
-The Department Assistant is a production-ready RAG system with a Streamlit interface:
+The Department Assistant is a production-ready RAG system with a Streamlit interface. Full details (config, architecture, troubleshooting) live in its own [README](Scripts/Project/Department_Assistant/README.md) - this is just the quick version.
 
 #### First Time Setup (One-time)
+
+Building the database means scraping the whole department website, which takes 30-45+ minutes - too long to run safely inside a Streamlit session (risks timing out mid-scrape), so it's a standalone script instead:
+
 ```bash
 cd Scripts/Project/Department_Assistant
-streamlit run app.py
+& "..\..\..\venv\Scripts\python.exe" rebuild.py
 ```
 
-On first launch:
-1. Click "Initialize Database" in the sidebar
-2. Wait 25-40 minutes for the system to:
-   - Scrape 286 web pages from the Chemical Engineering department website
-   - Download 12 course curriculum PDFs (157 pages)
-   - Process content into 1,071 text chunks
-   - Generate and store embeddings in ChromaDB
+This backs up anything already at the vector DB path and in `downloaded_pdfs/` first, then scrapes fresh and builds a new database from scratch. It prints a summary (pages scraped, PDFs downloaded, chunks stored) when it's done.
 
 #### Regular Usage
-After initialization, simply run:
+Once the database exists, just run:
 ```bash
 cd Scripts/Project/Department_Assistant
 streamlit run app.py
@@ -610,47 +613,18 @@ Ask questions like:
 
 **Technical Details:**
 - Orchestrated by LangGraph with two separate StateGraphs
-- Uses Groq's `llama-3.3-70b-versatile` model for responses
-- HuggingFace `all-MiniLM-L6-v2` embeddings for retrieval
-- BFS-based web scraper with polite crawling
-- Persistent ChromaDB vector store
+- Uses Groq's `openai/gpt-oss-120b` model for responses (`llama-3.3-70b-versatile` was deprecated/decommissioned by Groq)
+- HuggingFace `all-MiniLM-L6-v2` embeddings for retrieval, cached per process (loaded once, not reloaded per question)
+- BFS-based web scraper with polite crawling, retries, and robots.txt checks
+- Persistent ChromaDB vector store, deliberately stored outside this OneDrive-synced folder
+- Light conversation memory (last few chat turns fed back to the LLM) so follow-up questions resolve correctly, without letting the model treat its own earlier answers as a source of facts
+- Sources are cited as a plain `Sources:` list at the end of an answer (real URLs only) rather than inline - the model is explicitly told not to invent bracketed citation markers
+
+**If you edit any file** under `nodes/`, `config.py`, `main.py`, etc. while `streamlit run app.py` is already running, a plain browser refresh won't pick it up - Streamlit's "rerun on save" only re-executes `app.py`, not already-imported modules. Fully stop and restart the command.
 
 **Requirements:**
 - Groq API key in `.env` file
-- Install streamlit: `pip install streamlit`
-
-python lang_graph5.py
-```
-Build a complete interactive number guessing game with state management.
-Agents/`)
-
-Progressive tutorials showcasing LangGraph capabilities:
-
-#### lang_graph1.py - Basic Structure
-- Single node graph implementation
-- Simple state management with TypedDict
-- Entry and finish point configuration
-
-#### lang_graph2.py - Multiple Inputs
-- Processing lists of values
-- Conditional operations (addition/multiplication)
-- Handling complex input structures
-
-#### lang_graph3.py - Sequential Workflow
-- Multi-node pipeline with edges
-- State transformation across nodes
-- Sequential data processing
-
-#### lang_graph4.py - Conditional Routing
-- Dynamic node routing based on state
-- Multiple conditional branches
-- Decision-making functions
-
-#### lang_graph5.py - Interactive Application
-- Complete game implementation (number guessing)
-- User interaction handling
-- Complex state management with multiple attributes
-- Iterative workflows with loop conditions
+- Install this project's own pinned dependencies: `pip install -r requirements.txt` from inside `Department_Assistant/`
 
 ## Components
 
@@ -862,8 +836,6 @@ Sequential multi-agent system demonstrating ordered agent execution for intellig
 
 **Dependencies:** `pip install google-adk`
 
-**Dependencies:** `pip install google-adk`
-
 ### 2. Department Assistant Project (`Project/Department_Assistant/`)
 
 A production-ready RAG (Retrieval-Augmented Generation) pipeline built with **LangGraph** for intelligent Q&A about IIT Bombay's Chemical Engineering Department.
@@ -877,10 +849,7 @@ Complete end-to-end RAG system that:
 4. Provides intelligent answers through Streamlit chat interface
 5. Orchestrates entire workflow using LangGraph StateGraphs
 
-**Data Processed:**
-- **286 web pages** from department website
-- **12 PDF files** (157 total pages) with course curricula
-- **1,071 text chunks** in vector database
+**Data Processed:** varies by whatever the last `rebuild.py` run found (up to 350 pages, plus any PDFs it discovers) - check that script's printed summary for current numbers rather than relying on a number written here.
 
 #### Architecture
 
@@ -900,28 +869,28 @@ START → Retriever Node → Responder Node → END
 
 **app.py - Streamlit Frontend:**
 - Interactive chat interface
-- Database initialization button
+- Points users at `rebuild.py` when the database isn't built yet, rather than triggering a long scrape from inside the Streamlit session
 - Chat history management
 - Progress indicators and status displays
-- Error handling and user feedback
+- Error handling and user feedback - real pipeline errors now surface as errors instead of a generic "I don't have that information" answer
 
 **main.py - LangGraph Orchestration:**
 - Defines two StateGraph workflows
 - `collect_data()`: Runs scraping and processing pipeline
-- `run_query()`: Executes retrieval and response generation
+- `run_query()`: Executes retrieval and response generation, raises if either node reported an internal failure
 - State management for workflow coordination
 
 **config.py - Configuration:**
-- Scraping parameters (delays, max pages, allowed domains)
-- Chunking settings (size: 1000, overlap: 200)
+- Scraping parameters (delays, max pages, allowed domains, retry count)
+- Chunking settings (size: 1500, overlap: 300)
 - Model configurations (Groq LLM, HuggingFace embeddings)
-- Retrieval parameters (top-k: 5)
+- Vector DB path (deliberately outside this OneDrive-synced folder)
 - File paths and constants
+- Note: retrieval top-k (10) is set in `retriever_node.py` directly, not here
 
 **state.py - State Definitions:**
-- `DataCollectionState`: Tracks scraped URLs, PDFs, text chunks
-- `QueryState`: Manages user queries, retrieved docs, responses
-- TypedDict definitions for type safety
+- `PipelineState`: a single shared TypedDict used by both the data-collection graph and the query graph (scraped pages, PDFs, chunks, query, `chat_history`, retrieved docs, response, status, error all live on one schema)
+- `chat_history` carries prior conversation turns into a query run, but the graph itself has no memory between calls - each `run_query()` builds a fresh state, and the caller (`app.py`) is responsible for passing in whatever history it wants considered
 
 #### Workflow Nodes
 
@@ -929,31 +898,33 @@ START → Retriever Node → Responder Node → END
 - BFS (Breadth-First Search) web crawling algorithm
 - Domain filtering to stay within allowed domain
 - Duplicate URL detection
+- Checks `robots.txt` once and skips disallowed paths
+- Strips `<nav>`/`<header>`/`<footer>` before extracting text, so the same site-wide chrome doesn't get duplicated into every page's chunks
 - PDF link identification and download
 - BeautifulSoup for HTML parsing
-- Polite crawling with configurable delays
-- Robust error handling for failed requests
+- Polite crawling with configurable delays, and retries for transient failures (timeouts/connection errors/5xx - not 403/404)
 
 **nodes/processor_node.py - Text Processing:**
 - Text extraction from HTML using BeautifulSoup
-- PDF parsing with PyPDF2
-- Recursive character text splitting (chunk_size=1000, overlap=200)
+- PDF parsing with `pypdf` (via `PyPDFLoader`)
+- Recursive character text splitting (chunk_size=1500, overlap=300)
 - HuggingFace embeddings generation (`all-MiniLM-L6-v2`)
 - ChromaDB vector store creation and persistence
 - Batch processing for efficiency
 
 **nodes/retriever_node.py - Semantic Search:**
-- Loads persistent ChromaDB vector database
-- Similarity search using cosine distance
-- Top-k retrieval (k=5) for relevant documents
+- Embedding model + Chroma connection cached at module level (created once per process, not per query)
+- MMR (Maximal Marginal Relevance) search - balances relevance against diversity, not pure similarity ranking
+- Top-k retrieval (k=10, fetch_k=30 candidates before MMR filtering)
 - Returns document content and metadata
-- Efficient vector similarity computation
 
 **nodes/responder_node.py - Answer Generation:**
-- Groq LLM integration (`llama-3.3-70b-versatile`)
+- Groq LLM integration (`openai/gpt-oss-120b`)
 - Context-aware prompting with retrieved documents
 - RAG prompt template for grounded responses
 - Prevents hallucination by grounding in source documents
+- Converts the last `CHAT_HISTORY_TURNS` (3, in `config.py`) chat turns into real prior conversation messages, so follow-up questions resolve correctly - while the prompt still requires every factual claim to come from the current question's retrieved context, not from earlier answers
+- Cites sources as a plain end-of-answer `Sources:` list of real URLs only, never inline or fabricated citation markers
 - Formatted, conversational responses
 - Temperature-controlled generation
 
@@ -962,58 +933,58 @@ START → Retriever Node → Responder Node → END
 **Intelligent Web Scraping:**
 - BFS traversal for systematic coverage
 - Robots.txt compliance (polite crawling)
-- Configurable crawl depth and delays
+- Configurable crawl depth and delays, with retries for transient failures
 - Domain boundary enforcement
 - PDF detection and batch downloading
 
 **Advanced Text Processing:**
 - Multi-source ingestion (HTML + PDF)
+- Site-chrome stripping (nav/header/footer) before chunking
 - Smart chunking with overlap for context preservation
 - Metadata tracking (source URL, page numbers)
 - Efficient embedding generation
-- Persistent vector storage
+- Persistent vector storage, kept outside the OneDrive-synced project folder
 
 **Powerful Retrieval:**
-- Semantic similarity search (not keyword-based)
+- MMR search (relevance balanced against diversity), not pure similarity ranking
 - Ranked results by relevance
-- Fast vector database queries
+- Cached embedding model + DB connection (loaded once per process)
 - Contextual document snippets
 
 **User-Friendly Interface:**
 - Clean Streamlit chat UI
-- Conversation history
-- Real-time response streaming
+- Conversation history displayed in the UI, and fed back to the LLM as light conversation memory so follow-up questions work
 - Database status indicators
-- One-click initialization
+- Real errors (not a generic "no information" answer) when something actually breaks
+- Points at `rebuild.py` when the database needs building, instead of a risky in-app long-running button
 
 #### Technical Specifications
 
 **Models:**
-- LLM: `llama-3.3-70b-versatile` (Groq)
+- LLM: `openai/gpt-oss-120b` (Groq) - `llama-3.3-70b-versatile` was deprecated/decommissioned by Groq
 - Embeddings: `sentence-transformers/all-MiniLM-L6-v2` (HuggingFace)
 
-**Libraries:**
-- LangGraph: Workflow orchestration
-- LangChain: RAG pipeline components
-- ChromaDB: Vector database
-- Streamlit: Web interface
-- BeautifulSoup4: Web scraping
-- PyPDF2: PDF processing
-- Requests: HTTP client
+**Libraries:** (pinned exactly in this project's own `requirements.txt`)
+- LangGraph 1.0.7: Workflow orchestration
+- LangChain 1.2.0 / LangChain Core 1.2.7 / LangChain Community 0.4.1: RAG pipeline components
+- ChromaDB 1.4.1: Vector database
+- Streamlit 1.54.0: Web interface
+- BeautifulSoup4 4.14.3: Web scraping
+- pypdf 6.6.2: PDF processing
+- Requests 2.32.5: HTTP client
 
 **Configuration:**
-- Chunk size: 1000 characters
-- Chunk overlap: 200 characters
-- Top-k retrieval: 5 documents
-- Max pages: 500 (currently scrapes 286)
-- Crawl delay: 0.5 seconds
+- Chunk size: 1500 characters
+- Chunk overlap: 300 characters
+- Top-k retrieval: 10 documents (MMR search, fetch_k=30)
+- Max pages: 350
+- Crawl delay: 1.5 seconds
 - Request timeout: 10 seconds
+- Retries per page: 2 (transient failures only)
 
 **Performance:**
-- Initial data collection: 25-40 minutes
-- Query response time: 2-5 seconds
-- Database size: ~50 MB
-- Total documents: 1,071 chunks
+- Full rebuild (`rebuild.py`): well over half an hour with MAX_PAGES=350, plus embedding generation - see the printed summary for actual figures from the last run
+- Query response time: a few seconds, except the very first query after starting the app (loads the embedding model once)
 
 #### Use Cases
 
@@ -1048,21 +1019,25 @@ START → Retriever Node → Responder Node → END
 GROQ_API_KEY=your_groq_api_key_here
 ```
 
-2. **Dependencies**:
-```bash
-pip install streamlit langchain langgraph langchain-groq langchain-huggingface
-pip install chromadb beautifulsoup4 pypdf2 requests sentence-transformers
-```
-
-3. **Running the Application**:
+2. **Dependencies** - use this project's own pinned `requirements.txt`, not the root one:
 ```bash
 cd Scripts/Project/Department_Assistant
+pip install -r requirements.txt
+```
+
+3. **Build the database (first time, or to refresh it)**:
+```bash
+& "..\..\..\venv\Scripts\python.exe" rebuild.py
+```
+
+4. **Running the Application**:
+```bash
 streamlit run app.py
 ```
 
-**First Launch:** Click "Initialize Database" in sidebar (one-time, takes 25-40 minutes)
+**First Launch:** run `rebuild.py` from a terminal first (takes 30-45+ minutes) - the app itself no longer offers an in-app initialization button, to avoid a long request timing out inside the Streamlit session.
 
-**Subsequent Launches:** Database persists, instant startup
+**Subsequent Launches:** Database persists, instant startup.
 
 #### Limitations
 
@@ -1070,18 +1045,20 @@ streamlit run app.py
 - PDF parsing may miss complex formatting
 - Requires stable internet for initial scraping
 - Response accuracy depends on source content quality
-- No real-time updates (database must be rebuilt manually)
+- No real-time updates (database must be rebuilt manually via `rebuild.py`)
 
 #### Future Enhancements
 
 - Incremental updates instead of full rebuild
-- Citation tracking (which document provided the answer)
+- Retrieval that's also chat-history-aware, not just the responder - currently a follow-up question is only *understood* using prior turns, but still searches the vector DB using just its own raw text
+- Summarizing/compressing older conversation turns instead of a hard cutoff at `CHAT_HISTORY_TURNS`
 - Multi-language support
 - Advanced filtering (by content type, date, faculty)
 - Query analytics and logging
 - User feedback mechanism for answer quality
+- A stronger embedding model than all-MiniLM-L6-v2, if retrieval quality still needs work
 
-**Dependencies:** `pip install streamlit langchain-groq beautifulsoup4 pypdf2`
+*(Citation tracking is done - see the responder's `Sources:` list above.)*
 
 ### 3. Transformer-Based NLP (`transformer/Assignment_1/`)
 
@@ -1168,37 +1145,7 @@ Multi-class sentiment classification system for analyzing movie reviews and gene
 
 **Use Case:** Analyze customer reviews, social media sentiment, or any text-based feedback
 
-### 5. LangGraph Tutorials (`Langgraph/Agents/`)
-
-Progressive tutorials showcasing LangGraph capabilities:
-
-#### lang_graph1.py - Basic Structure
-- Single node graph implementation
-- Simple state management with TypedDict
-- Entry and finish point configuration
-
-#### lang_graph2.py - Multiple Inputs
-- Processing lists of values
-- Conditional operations (addition/multiplication)
-- Handling complex input structures
-
-#### lang_graph3.py - Sequential Workflow
-- Multi-node pipeline with edges
-- State transformation across nodes
-- Sequential data processing
-
-#### lang_graph4.py - Conditional Routing
-- Dynamic node routing based on state
-- Multiple conditional branches
-- Decision-making functions
-
-#### lang_graph5.py - Interactive Application
-- Complete game implementation (number guessing)
-- User interaction handling
-- Complex state management with multiple attributes
-- Iterative workflows with loop conditions
-
-### 6. Advanced AI Agents (`Langgraph/AI Agents/`)
+### 5. Advanced AI Agents (`Langgraph/AI Agents/`)
 
 Production-ready AI agent implementations:
 
@@ -1282,43 +1229,6 @@ Practical assignments demonstrating progressive LangGraph concepts:
 
 **Use Case:** Demonstrates practical LangGraph patterns for building multi-agent systems with routing logic
 
-ProgGroq**: High-performance LLM inference API
-- **ChromaDB**: Vector database for embeddings storage and retrieval
-- **HuggingFace**: Embedding models and transformers
-Create a `.env` file in the project root for the AI Agents:
-
-```env
-GROQ_API_KEY=your_groq_api_key_here
-```
-
-Get your Groq API key from [https://console.groq.com](https://console.groq.com)
-
-#### lang_graph1.py - Basic Structure
-- Single node graph implementation
-- Simple state management with TypedDict
-- Entry and finish point configuration
-
-#### lang_graph2.py - Multiple Inputs
-- Processing lists of values
-- Conditional operations (addition/multiplication)
-- Handling complex input structures
-
-#### lang_graph3.py - Sequential Workflow
-- Multi-node pipeline with edges
-- State transformation across nodes
-- Sequential data processing
-
-#### lang_graph4.py - Conditional Routing
-- Dynamic node routing based on state
-- Multiple conditional branches
-- Decision-making functions
-
-#### lang_graph5.py - Interactive Application
-- Complete game implementation (number guessing)
-- User interaction handling
-- Complex state management with multiple attributes
-- Iterative workflows with loop conditions
-
 ## Technologies Used
 
 - **LangChain**: Framework for developing LLM-powered applications
@@ -1330,7 +1240,7 @@ Get your Groq API key from [https://console.groq.com](https://console.groq.com)
 - **Transformers**: Pre-trained NLP models (BERT, GPT-2, BART)
 - **Streamlit**: Python framework for building interactive web applications
 - **BeautifulSoup4**: Web scraping and HTML/XML parsing
-- **PyPDF2**: PDF document processing and text extraction
+- **pypdf**: PDF document processing and text extraction (Department_Assistant; other scripts may still use PyPDF2/PyPDFLoader per their own imports)
 - **yfinance**: Real-time financial market data retrieval
 - **Pandas**: Data manipulation and analysis
 - **NumPy**: Numerical computing library
@@ -1454,8 +1364,9 @@ pytest
 - Verify models are pulled: `ollama list`
 
 **2. ChromaDB Persistence**
-- Vector databases are stored in `chroma_langchain_db/` and `chroma_rag_db/`
-- Delete these folders to reset the database
+- Vector databases for the tutorials/agents are stored in `chroma_langchain_db/` and `chroma_rag_db/` - delete these folders to reset them
+- `Department_Assistant`'s database is separate and lives outside this repo entirely (see its own README) - use its `rebuild.py` to reset it, not a manual folder delete
+- (Previously there were leftover `department_vector_db` / `department_vector_db_new` folders at the WIDS Project root from a past misdirected rebuild, plus a stray `Claude outputs/` staging folder - these have since been cleaned up; if they reappear, they're safe to delete, they're not referenced by any code)
 
 **3. Google ADK Agents Not Running**
 - Ensure you're in the correct directory
