@@ -1,0 +1,44 @@
+# Department Assistant - pinned to exactly what's installed and verified working
+# in this project's venv. Deliberately scoped to just this project (the shared
+# WIDS Project/requirements.txt covers other sub-projects too and is left alone).
+#
+# Pinned rather than >= because unpinned requirements are what let this venv
+# drift from langchain 0.3 / langgraph 0.2 / chromadb 0.5 (what this project was
+# built against, per the old README) up to langchain 1.2 / langgraph 1.0 /
+# chromadb 1.4 - a jump across major-version rewrites that's what actually broke
+# things. Re-verify deliberately before bumping any of these.
+
+# Core LangChain / LangGraph
+langchain==1.2.0
+langchain-core==1.2.7
+langchain-community==0.4.1
+langchain-text-splitters==1.1.0
+langgraph==1.0.7
+
+# LLM + embeddings integrations
+langchain-groq==1.1.1
+langchain-huggingface==1.2.0
+groq==0.37.1
+sentence-transformers==5.2.0
+transformers==4.57.3
+torch==2.9.1
+huggingface-hub==0.36.0
+
+# Vector store
+langchain-chroma==1.1.0
+chromadb==1.4.1
+
+# PDF processing (langchain-community, pinned above, provides PyPDFLoader)
+pypdf==6.6.2
+
+# Web scraping
+requests==2.32.5
+beautifulsoup4==4.14.3
+lxml==6.0.2
+
+# Frontend
+streamlit==1.54.0
+
+# Utilities
+python-dotenv==1.2.1
+pydantic==2.12.5
